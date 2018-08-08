@@ -22,6 +22,7 @@ if __name__=='__main__':
 
     checker = code_viewer(sql)
     checker.run()
+    print('hello neo!')
 	
 
 

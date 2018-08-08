@@ -1,6 +1,6 @@
 #-*-utf8-*-
 import sys
-content = ['..\\venv\\err',  '..\\venv\\utils']   #添加包路径。
+content = ['..\\err',  '..\\utils']   #添加包路径。
 sys.path.extend(content)
 import error
 import os
