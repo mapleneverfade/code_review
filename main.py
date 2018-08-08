@@ -23,3 +23,5 @@ if __name__=='__main__':
     checker = code_viewer(sql)
     checker.run()
 
+	print('test of git')
+	print('new branch')
