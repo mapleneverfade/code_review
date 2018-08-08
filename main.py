@@ -22,4 +22,6 @@ if __name__=='__main__':
 
     checker = code_viewer(sql)
     checker.run()
+	
+	print('New startup')
 
