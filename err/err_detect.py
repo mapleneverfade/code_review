@@ -7,6 +7,7 @@ from .err_define import error_define
 '''
 class error_detect():
     def __init__(self):
+        self.isRight = True
         self._statement = []
         self._field = []
         self.global_exception ={              #统计全局错误
@@ -18,7 +19,6 @@ class error_detect():
         }
         self.local_table_name = {}           #记录目标表名与写入次数。
         self.local_exception = {}
-
         self.target_table_statement = []     #记录包含目标表的语句，后续处理。
         self.err = error_define()
 
@@ -70,21 +70,54 @@ class error_detect():
         else:
             return False
 
+
+    #清除err_detector结果，扫描下一个文件。
+    def clear(self):
+        self.isRight = True
+        self._statement = []
+        self._field = []
+        self.global_exception = {  # 统计全局错误
+            'select *': 0,
+            'create multi-table': 0,
+            'drop table': 0,
+            'insert target': 0,
+            'flag_distinct': False
+        }
+        self.local_table_name = {}  # 记录目标表名与写入次数。
+        self.local_exception = {}
+        self.target_table_statement = []  # 记录包含目标表的语句，后续处理。
+
+    def setWrong(self):
+        self.isRight = False
+
     #输出异常检测结果
     def print_exception(self):
         if self.global_exception['select *'] > 0:
             self.err.select_error()
+            self.setWrong()
         if self.global_exception['create multi-table'] > 2:
             self.err.multi_temp_table_error()
+            self.setWrong()
         if self.global_exception['create multi-table']>=2 and self.global_exception['drop table']==0:
             self.err.no_drop_error()
+            self.setWrong()
         sort_table = sorted(self.local_table_name.items(), key=lambda x: x[1], reverse=True)
 
         if len(self.local_table_name)>1:
             self.err.multi_target_error()
-        if sort_table[0][1]>1:
-            self.err.multi_write_error()
+            self.setWrong()
+
+        try :
+            if sort_table[0][1]>1:
+                self.err.multi_write_error()
+                self.setWrong()
+        except IndexError as i:
+            print('No target table!')
+
         if self.global_exception['flag_distinct']:
             self.err.over_distinct_error()
+            self.setWrong()
 
+        if self.isRight:
+            print('扫描完毕，未发现错误！')
 
