@@ -54,7 +54,7 @@ class error_detect():
 
         result_select = re.findall(select_pattern, sql, re.IGNORECASE)  # 匹配 'select'
         result_create = re.findall(create_pattern, sql, re.IGNORECASE)  # 匹配 'create'
-        result_drop = re.findall(drop_pattern, sql, re.IGNORECASE)  # 匹配 'drop'
+        result_drop = re.findall(drop_pattern, sql, re.IGNORECASE)      # 匹配 'drop'
 
         if len(re.findall(distinct_pattern, sql, re.IGNORECASE)) > 3:  # 对于distinct关键字的检测，以flag_distinct为标志。
             flag_distinct = True
@@ -119,5 +119,5 @@ class error_detect():
             self.setWrong()
 
         if self.isRight:
-            print('扫描完毕，未发现错误！')
+            print('     扫描完毕，未发现错误！')
 

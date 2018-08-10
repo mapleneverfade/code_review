@@ -34,14 +34,14 @@ if __name__=='__main__':
     detector = load_cut_statement()
     err = error_detect()
     for i in file_sql:
-        print(i)
+        print('检测文本 ：{}'.format(i))
         err.clear()
         detector.load_sql(os.path.join(parser.foldername,i))
         detector.split_to_statement()
         err.get_statement(detector.statement)
         err.global_exception_detect()
         err.print_exception()
-
+        print('{}检测结束！'.format(i))
 
 
 
