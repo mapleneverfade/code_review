@@ -5,18 +5,22 @@ from .err_define import error_define
 '''
     code review异常检测。
 '''
+
+global_exception = {                                    #统计全局错误
+                'select *':                  0,
+                'create multi-table':      0,
+                'drop table':               0,
+                'insert target':           0,
+                'update target':           0,         #采用update更新目标表
+                'flag_distinct':         False
+        }
+
 class error_detect():
     def __init__(self):
         self.isRight = True
         self._statement = []
         self._field = []
-        self.global_exception ={              #统计全局错误
-                'select *':                  0,
-                'create multi-table':      0,
-                'drop table':               0,
-                'insert target':           0,
-                'flag_distinct':         False
-        }
+        self.global_exception =global_exception.copy()
         self.local_table_name = {}           #记录目标表名与写入次数。
         self.local_exception = {}
         self.target_table_statement = []     #记录包含目标表的语句，后续处理。
@@ -45,6 +49,8 @@ class error_detect():
                 else:
                     self.local_table_name[table_name] += 1
 
+        self.detect_update_target()  #检测是否update目标表
+
     def detect_keyword(self, sql):  # 针对单语句正则匹配相应关键字。
         select_pattern = 'select\s*\\*'  # 正则匹配模式
         create_pattern = 'create'
@@ -62,33 +68,43 @@ class error_detect():
         tmp_table = self.extract_table_name(sql)
         return len(result_select), len(result_create), len(result_drop), tmp_table, flag_distinct
 
+    #统计insert与update语句中出现的表名。
+    '''
+        不够鲁棒 "insert into" 之间不能有多余一个空格。
+    '''
     def extract_table_name(self, sql):
-        pattern = '(?<=insert into ).*?(?=\()'  # 提取表名，前向界定、后向界定、懒惰匹配。
-        result = re.findall(pattern, sql.lower(), re.DOTALL)
-        if len(result) > 0:
-            return result[0]  # 返回表名
+        insert_pattern = '(?<=insert into).*?(?=\()'          # 提取表名，前向界定、后向界定、懒惰匹配。
+        update_pattern = '(?<=update ).*?(?=\()'
+
+        result_insert = re.findall(insert_pattern, sql.lower(), re.DOTALL)
+        result_update = re.findall(update_pattern, sql.lower(),re.DOTALL)
+
+        if len(result_insert) > 0:
+            return result_insert[0].strip()  # 返回表名
+        elif len(result_update)>0:
+            return result_update[0].strip()  # update 目标表
         else:
             return False
-
 
     #清除err_detector结果，扫描下一个文件。
     def clear(self):
         self.isRight = True
         self._statement = []
         self._field = []
-        self.global_exception = {  # 统计全局错误
-            'select *': 0,
-            'create multi-table': 0,
-            'drop table': 0,
-            'insert target': 0,
-            'flag_distinct': False
-        }
-        self.local_table_name = {}  # 记录目标表名与写入次数。
+        self.global_exception = global_exception.copy()   # 赋值副本，否则会更改原定义。
+        self.local_table_name = {}                        # 记录目标表名与写入次数。
         self.local_exception = {}
-        self.target_table_statement = []  # 记录包含目标表的语句，后续处理。
+        self.target_table_statement = []                  # 记录包含目标表的语句，后续处理。
 
     def setWrong(self):
         self.isRight = False
+
+    #检测是否用update更新目标表。
+    def detect_update_target(self):
+        update_pattern = 'update'
+        for i in self.target_table_statement:
+            if len(re.findall(update_pattern, i, re.IGNORECASE)):
+                self.global_exception['update target'] += 1
 
     #输出异常检测结果
     def print_exception(self):
@@ -117,6 +133,9 @@ class error_detect():
         if self.global_exception['flag_distinct']:
             self.err.over_distinct_error()
             self.setWrong()
+
+        if self.global_exception['update target'] > 0:
+            self.err.update_target_table_error()
 
         if self.isRight:
             print('     扫描完毕，未发现错误！')

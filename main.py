@@ -11,26 +11,46 @@ from options import Options
     
     例如: python main.py --foldername 'c://test//'
 '''
+
+class code_review():
+    def __init__(self):
+        self.parser = Options().parse()
+        self.detector = load_cut_statement()
+        self.err = error_detect()
+
+    def run(self):
+        if self.parser.folder:
+            file_sql = os.listdir(self.parser.foldername)   # 判断是否检测整个文件夹。
+            for i in file_sql:
+                self.execute(i)
+        else:
+            file_sql = self.parser.filename
+            self.execute(file_sql)
+
+    def execute(self, filename):
+        print('********{} 检测开始********'.format(filename))
+        self.err.clear()
+        self.detector.load_sql(os.path.join(self.parser.foldername, filename))
+        self.detector.split_to_statement()
+        self.err.get_statement(self.detector.statement)
+        self.err.global_exception_detect()
+        self.err.print_exception()
+        print('********{} 检测结束********'.format(filename))
+
+
+
 if __name__=='__main__':
 
+    main = code_review()
+    main.run()
+    '''
     parser = Options().parse()
     if parser.folder :
         file_sql = os.listdir(parser.foldername)
+    else:
+        file_sql = parser.filename
 
-    filename = 'D:\\项目管理\\venv\\test\\tmp_1.sql'
-    '''
-    detector = load_cut_statement()
-
-    detector.load_sql(filename)
-    detector.split_to_statement()
-
-    err = error_detect()
-    err.get_statement(detector.statement)  #传入statement
-    err.global_exception_detect()            #异常检测
-    err.print_exception()                    #输出异常
-    '''
-
-
+    print(file_sql)
     detector = load_cut_statement()
     err = error_detect()
     for i in file_sql:
@@ -42,10 +62,6 @@ if __name__=='__main__':
         err.global_exception_detect()
         err.print_exception()
         print('{}检测结束！'.format(i))
-
-
-
-   # print(err.target_table_statement)  #脚本中的保存目标表语句。
 	
-
+    '''
 
