@@ -5,6 +5,7 @@ from utils.load_and_cut import load_cut_statement
 from err.err_detect import error_detect
 import err.err_detect
 from options import Options
+import types
 
 '''
     扫描parser.foldername目录下的所有文本，输出扫描结果。
@@ -19,10 +20,12 @@ class code_review():
         self.err = error_detect()
 
     def run(self):
-        if self.parser.folder:
+        if self.parser.isFolder:
+
             file_sql = os.listdir(self.parser.foldername)   # 判断是否检测整个文件夹。
             for i in file_sql:
-                self.execute(i)
+                print(self.parser.isFolder)
+                self.execute(os.path.join(self.parser.foldername,i))
         else:
             file_sql = self.parser.filename
             self.execute(file_sql)
@@ -30,7 +33,7 @@ class code_review():
     def execute(self, filename):
         print('********{} 检测开始********'.format(filename))
         self.err.clear()
-        self.detector.load_sql(os.path.join(self.parser.foldername, filename))
+        self.detector.load_sql(filename)
         self.detector.split_to_statement()
         self.err.get_statement(self.detector.statement)
         self.err.global_exception_detect()
@@ -38,9 +41,10 @@ class code_review():
         print('********{} 检测结束********'.format(filename))
 
 
-
+'''
+    测试是否parser.isFolder 布尔类型bug
+'''
 if __name__=='__main__':
-
     main = code_review()
     main.run()
     '''

@@ -270,7 +270,8 @@ INSERT INTO mgr_fat.mbl_first_page_channel_day
     ,7D_ADD_PRCP_BAL         -- 近7日净增 
 	,7D_APL_CUST_CNT         -- 7天申请用户
 	,7D_APV_PAS_CRD_CNT      -- 7天审批通过 
-	,7D_VLD_APV_CPL_CUST_CNT -- 7天审批结案	                                           
+	,7D_VLD_APV_CPL_CUST_CNT -- 7天审批结案	        
+	,etl_tms
 )
 
 select 
@@ -284,6 +285,7 @@ select
 	,sum(apl_cust_cnt)           -- 7天申请用户数
 	,sum(tdy_apv_pas_cust)       -- 7天审批通过数
 	,sum(vld_apv_cpl_cust_cnt)   -- 7天审批结案数
+	,sysdate
 	
 from mgr_fat.ceo_management_day
 where stat_dt > date'$v_date' - interval '7 day'

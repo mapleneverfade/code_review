@@ -12,7 +12,8 @@ class error_define():
             'multi-target':       Exception('       SQL 脚本写入多个目标表 '),      # yes
             'multi-write':        Exception('       SQL 脚本多次写入目标表 '),      # yes
             'over-distinct':     Exception('        SQL 语句包含多条 distinct '),  # yes
-            'update-target':     Exception('        SQL UPDATE 目标表 ')            # yes
+            'update-target':     Exception('        SQL UPDATE 目标表 ') ,          # yes
+            'implicit-etl-tms'       :     Exception('        SQL 未显式赋值etl_tms')         # ing
         }
     # select * 错误
     def select_error(self):
@@ -41,3 +42,5 @@ class error_define():
     def update_target_table_error(self):
         print(self.exception['update-target'])
 
+    def implicit_etl_tms_error(self):
+        print(self.exception['implicit-etl-tms'])

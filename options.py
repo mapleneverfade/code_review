@@ -12,7 +12,7 @@ class Options():
         self.initialized = False
 
     def initialize(self):
-        self.parser.add_argument('--folder', default=True)
+        self.parser.add_argument('--isFolder', type=bool, default=False)   #是否bug
         self.parser.add_argument('--foldername', type=str, default='./test')
         self.parser.add_argument('--filename', type=str, default='./test/tmp_1.sql')
 
