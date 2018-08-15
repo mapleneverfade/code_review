@@ -19,7 +19,7 @@ CREATE TABLE neo_fake.it_is_there(
 );
 
 
-INSERT INTO mgr_fat_mbl_first_page_channel_day(
+insert INTO mgr_fat_mbl_first_page_channel_day(
 	 stat_dt                 ,fst_chnl_cd             ,tdy_crd_cust_cnt       -- 日期，           渠道，           授信客户数（获客数）
 	,new_dtrb_amt            ,rep_dtrb_amt            ,rpay_amt               -- 新借贷款余额,    复借贷款余额，   还款总金额
 	,prcp_bal                ,tdy_add_prcp_bal        ,ovd_prcp_bal           -- 贷款余额,        净增余额,        逾期金额
@@ -33,7 +33,7 @@ INSERT INTO mgr_fat_mbl_first_page_channel_day(
 );
 
 
-update  mgr_dim.mbl_second_channel_day(
+INSERT  into mgr_dim.mbl_second_channel_day(
 	 stat_dt                 ,fst_chnl_cd             ,tdy_crd_cust_cnt       -- 日期，           渠道，           授信客户数（获客数）
 	,new_dtrb_amt            ,rep_dtrb_amt            ,rpay_amt               -- 新借贷款余额,    复借贷款余额，   还款总金额
 	,prcp_bal                ,tdy_add_prcp_bal        ,ovd_prcp_bal           -- 贷款余额,        净增余额,        逾期金额
@@ -67,7 +67,7 @@ group by
 ;
 drop table ceo.management;
 
-update  mgr_dim.mbl_second_channel_day
+insert into mgr_dim.mbl_second_channel_day
 (
 	 stat_dt                 ,fst_chnl_cd             ,tdy_crd_cust_cnt       -- 日期，           渠道，           授信客户数（获客数）
 	,new_dtrb_amt            ,rep_dtrb_amt            ,rpay_amt               -- 新借贷款余额,    复借贷款余额，   还款总金额

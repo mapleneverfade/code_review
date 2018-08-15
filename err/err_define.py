@@ -6,14 +6,22 @@
 class error_define():
     def __init__(self):
         self.exception = {
-            'select': Exception("       SQL 程序中包含 'SELECT *'"),  # yes
-            'multi-temp-table':   Exception('       SQL 脚本创建两个以上临时表'),  # yes
-            'no-drop-table':      Exception('       SQL 脚本未显式销毁临时表'),     # yes
-            'multi-target':       Exception('       SQL 脚本写入多个目标表 '),      # yes
-            'multi-write':        Exception('       SQL 脚本多次写入目标表 '),      # yes
-            'over-distinct':     Exception('        SQL 语句包含多条 distinct '),  # yes
-            'update-target':     Exception('        SQL UPDATE 目标表 ') ,          # yes
-            'implicit-etl-tms'       :     Exception('        SQL 未显式赋值etl_tms')         # ing
+            'select':                      Exception("       SQL 程序中包含 'SELECT *'"),  # yes
+            'multi-temp-table':           Exception('       SQL 脚本创建两个以上临时表'),  # yes
+            'no-drop-table':               Exception('       SQL 脚本未显式销毁临时表'),     # yes
+            'multi-target':                Exception('       SQL 脚本写入多个目标表 '),      # yes
+            'multi-write':                 Exception('       SQL 脚本多次写入目标表 '),      # yes
+            'over-distinct':               Exception('        SQL 语句包含多条 distinct '),  # yes
+            'update-target':               Exception('        SQL UPDATE 目标表 ') ,          # yes
+            'implicit-etl-tms':            Exception('        SQL 未显式赋值etl_tms') ,        # ing
+
+            'case-no-else':                 Exception('        case语句缺失else分支'),         # ing
+            'insert-select-lack-field':   Exception('        select|insert未显式提供字段名'),         # ing
+            'join-no-outer-inner'      :   Exception('        JOIN未指定outer|inner'),         # ing
+            'not-between'                :  Exception('        SQL脚本出现NOT-BETWEEN') ,        # ing
+            'where-function'            :  Exception('        函数操作 where 条件字段'),        # ing
+            'count *':                       Exception('        SQL脚本包含 count *'),         # ing
+            'no-commit-preserve-rows'   : Exception('        未创建on-commit-preserve-rows')         # ing
         }
     # select * 错误
     def select_error(self):
