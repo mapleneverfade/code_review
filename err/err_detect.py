@@ -12,7 +12,7 @@ global_exception = {                                    #统计全局错误
                 'drop table':               0,
                 'insert target':           0,
                 'update target':           0,         #采用update更新目标表
-                'flag_distinct':         False,
+                'flag_distinct':         False,      # 单条语句包含多余三条distinct
                 'etl_tms'       :            0         #是否显式更新etl_tms
         }
 
@@ -22,9 +22,9 @@ class error_detect():
         self._statement = []
         self._field = []
         self.global_exception =global_exception.copy()
-        self.local_table_name = {}           #记录目标表名与写入次数。
+        self.local_table_name = {}                    # 记录目标表名与写入次数。
         self.local_exception = {}
-        self.target_table_statement = []     #记录包含目标表的语句，后续处理。
+        self.target_table_statement = []              # 记录包含目标表的语句，后续处理。
         self.err = error_define()
 
     def get_statement(self, statement):
@@ -172,3 +172,15 @@ class error_detect():
         if self.isRight:
             print('     扫描完毕，未发现错误！')
 
+
+class err_output():
+    def __init__(self, detector):
+        self.detector = detector
+        self.dst_filename = 'result.txt'
+
+    def output(self): #输出检测结果到文件。
+        #with open(self.dst_filename, 'a') as f:
+        pass
+
+    def __call__(self):
+        self.run_output

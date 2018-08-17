@@ -1,7 +1,7 @@
 #-*- coding:utf-8 -*-
 '''
     导入与分割SQL文本。
-    cut_statement()实现语句分割 ';'
+    split_to_statement() 实现语句分割 ';'
     cut_sub() 实现 , 号分割 ','
 '''
 # @property 控制读写
@@ -14,14 +14,14 @@ class load_cut_statement():
         self._sql = ''                              #字符串置空。
         with open(filepath, 'rb') as f:
             for line in f:
-                self._sql = '{} {}'.format(self._sql, line.decode('utf8').strip())
+                self._sql = f"{self._sql} {line.decode('utf8').strip()}"
         if not self._sql:
-            raise(Exception('loading error!'))   #导入SQL脚本异常。
+            raise(Exception('loading error!'))   # 导入SQL脚本异常。
 
-    def split_to_statement(self):                   #文本划分为语句。
+    def split_to_statement(self):                   # 文本划分为语句。
         self._statement = self._sql.split(';')
 
-    def split_to_field(self):                       #语句划分为字段。
+    def split_to_field(self):                       # ToDo 语句划分为字段。
         pass
 
     @property
@@ -33,7 +33,7 @@ class load_cut_statement():
         return self._statement
 
 
-
+# 功能测试
 if __name__ == '__main__':
     filename_1 = 'D:\\项目管理\\venv\\code-review\\test\\tmp_1.sql'
     filename_2 = 'D:\\项目管理\\venv\\code-review\\test\\tmp_2.sql'

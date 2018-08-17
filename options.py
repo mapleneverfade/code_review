@@ -5,7 +5,6 @@ import os
     命令行控制options
 '''
 
-
 class Options():
     def __init__(self):
         self.parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -21,8 +20,8 @@ class Options():
             self.initialize()
             self.opt = self.parser.parse_args()
             args = vars(self.opt)
-        print('**********参数信息**********')
+        print('------------参数信息------------')
         for k, v in sorted(args.items()):
             print('%s: %s' % (str(k), str(v)))
-        print('****************************')
+        print('-------------------------------')
         return self.opt

@@ -13,6 +13,14 @@ import types
     例如: python main.py --foldername 'c://test//'
 '''
 
+class Run():
+    def __init__(self):
+        pass
+    def run(self):
+        pass
+    def __call__(self):
+        self.run()
+
 class code_review():
     def __init__(self):
         self.parser = Options().parse()
@@ -24,7 +32,6 @@ class code_review():
 
             file_sql = os.listdir(self.parser.foldername)   # 判断是否检测整个文件夹。
             for i in file_sql:
-                print(self.parser.isFolder)
                 self.execute(os.path.join(self.parser.foldername,i))
         else:
             file_sql = self.parser.filename
@@ -32,13 +39,13 @@ class code_review():
 
     def execute(self, filename):
         print('********{} 检测开始********'.format(filename))
-        self.err.clear()
-        self.detector.load_sql(filename)
-        self.detector.split_to_statement()
+        self.err.clear()                                         # 清空err_detect类变量。
+        self.detector.load_sql(filename)                         # 导入SQL脚本
+        self.detector.split_to_statement()                       # 分割SQL语句
         self.err.get_statement(self.detector.statement)
-        self.err.global_exception_detect()
-        self.err.print_exception()
-        print('********{} 检测结束********'.format(filename))
+        self.err.global_exception_detect()                       # 检测异常语法。
+        self.err.print_exception()                               # 输出检测结果。
+        print('********{} 检测结束********\n'.format(filename))
 
 
 '''
