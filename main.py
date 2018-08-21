@@ -5,6 +5,8 @@ from utils.load_and_cut import load_cut_statement
 from err.err_detect import error_detect
 import err.err_detect
 from options import Options
+from err.test_reconstruct import error_detection, err_printer, detector
+
 import types
 
 '''
@@ -51,28 +53,28 @@ class code_review():
 '''
     测试是否parser.isFolder 布尔类型bug
 '''
+import os
 if __name__=='__main__':
-    main = code_review()
-    main.run()
-    '''
     parser = Options().parse()
-    if parser.folder :
-        file_sql = os.listdir(parser.foldername)
-    else:
-        file_sql = parser.filename
+    folderpath = parser.foldername
+    dst_path = 'C:\\Users\\chenchangyu\\Desktop\\测试屋\\test.txt'
+    filelist = os.listdir(folderpath)
+    try:
+        for file in filelist:
+            sql = ''
+            with open(os.path.join(folderpath, file), 'rb') as f:
+                for line in f:
+                    pattern = '--.*?\n'                             # 匹配注释段
+                    i = re.sub(pattern, '', line.decode('utf8'))    # 剔除注释
+                    sql = f"{sql} {i.strip()}"
+            statement = sql.split(';')
+            detect = detector(sql, statement)
+            detect.detect()
 
-    print(file_sql)
-    detector = load_cut_statement()
-    err = error_detect()
-    for i in file_sql:
-        print('检测文本 ：{}'.format(i))
-        err.clear()
-        detector.load_sql(os.path.join(parser.foldername,i))
-        detector.split_to_statement()
-        err.get_statement(detector.statement)
-        err.global_exception_detect()
-        err.print_exception()
-        print('{}检测结束！'.format(i))
-	
-    '''
+            p = err_printer(dst_path, detect.global_exception, file)
+            p.print_to_file()
+    except :
+            print('Error accur!')
+
+
 

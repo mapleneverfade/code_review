@@ -21,7 +21,8 @@ class error_define():
             'not-between'                :  Exception('        SQL脚本出现NOT-BETWEEN') ,        # ing
             'where-function'            :  Exception('        函数操作 where 条件字段'),        # ing
             'count *':                       Exception('        SQL脚本包含 count *'),         # ing
-            'no-commit-preserve-rows'   : Exception('        未创建on-commit-preserve-rows')         # ing
+            'no-commit-preserve-rows'   : Exception('        未创建on-commit-preserve-rows'),         # ing
+            'explicit-field':               Exception('        未显式指定insert|select字段')
         }
     # select * 错误
     def select_error(self):
@@ -52,3 +53,6 @@ class error_define():
 
     def implicit_etl_tms_error(self):
         print(self.exception['implicit-etl-tms'])
+
+    def explicit_field(self):
+        print(self.exception['explicit-field'])
