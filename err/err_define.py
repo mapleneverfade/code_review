@@ -2,7 +2,7 @@
 '''
     code review异常定义。
 '''
-#异常定义类
+#   异常定义类
 class error_define():
     def __init__(self):
         self.exception = {

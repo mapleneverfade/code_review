@@ -12,8 +12,8 @@ class Options():
 
     def initialize(self):
         self.parser.add_argument('--isFolder', type=bool, default=False)   #是否bug
-        self.parser.add_argument('--foldername', type=str, default='./test')
-        self.parser.add_argument('--filename', type=str, default='./test/tmp_1.sql')
+        self.parser.add_argument('--folderName', type=str, default='./test')
+        self.parser.add_argument('--dstPath', type=str, default='./result/检测结果.txt')
 
     def parse(self):
         if not self.initialized:
