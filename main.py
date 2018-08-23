@@ -14,7 +14,7 @@ class code_review():
     def __init__(self):
         self.loader = load_sql()
         self.parser = Options().parse()
-        self.detector = None
+        self.detector = err_detector()
         self.printer = None
 
     def run(self):
@@ -28,11 +28,13 @@ class code_review():
             filepath = os.path.join(self.parser.folderName, file)
             sql = self.loader.load_delete_note(filepath)              # 导入去注释SQL文本
             statement = sql.split(';')
-            self.detector = err_detector(sql, statement)
+            #self.detector = err_detector(sql, statement)
+            self.detector.sql, self.detector.statement = sql, statement
             self.detector.detect()
 
             self.printer = err_printer(self.parser.dstPath, self.detector.global_exception, file)
             self.printer.print_to_file()
+            self.detector.clear()
         print('************ 检测结束 ************')
 
 '''

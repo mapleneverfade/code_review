@@ -12,7 +12,7 @@ CREATE LOCAL TEMPORARY TABLE tmp_fake_tab_2(
 ;
 CREATE LOCAL TEMPORARY TABLE tmp_fake_tab_3(
 		stat_dt date
-) 
+) on commit preserve rows
 ;
 
 create local temporary table mgr_dim.mbl_second_channel_monday
@@ -53,9 +53,9 @@ CREATE local temporary table  tmp_neo_fake.it_is_forth(
 	stat_dt Date NOT NULL DEFAULT '1900-01-01'::date,
 	fst_org_nbr Varchar(10) NOT NULL DEFAULT '',
 	fst_crd_dt Date Not NULL default '1900-01-01'::date,
-	fst_crd_situ_cd Varchar(200) NOT NULL DEFAULT '',
+	fst_crd_situ_cd Varchar(200) NOT NULL DEFAULT ''
 
-);
+)on commit preserve rows;
 
 CREATE TABLE tmp_neo_fake.it_is_there_02(
 	stat_dt Date NOT NULL DEFAULT '1900-01-01'::date,
@@ -75,7 +75,7 @@ CREATE TABLE tmp_neo_fake.it_is_there_02(
 	year_add_prcp_bal Numeric NOT NULL DEFAULT 0, 
 	CONSTRAINT pk_ceo_management_month PRIMARY KEY
 	(stat_dt, fst_org_nbr, fst_crd_dt, fst_crd_situ_cd, fst_prod_cd, fst_chnl_cd, fst_mch_nbr)
-);
+)on commit preserve rows;
 
 CREATE TABLE tmp_neo_fake.it_is_there_03(
 	stat_dt Date NOT NULL DEFAULT '1900-01-01'::date,
@@ -95,12 +95,15 @@ CREATE TABLE tmp_neo_fake.it_is_there_03(
 	year_add_prcp_bal Numeric NOT NULL DEFAULT 0, 
 	CONSTRAINT pk_ceo_management_month PRIMARY KEY
 	(stat_dt, fst_org_nbr, fst_crd_dt, fst_crd_situ_cd, fst_prod_cd, fst_chnl_cd, fst_mch_nbr)
-);
+)on commit preserve rows;
 
 update dwa_fat.lmt_contract_his
 	set end_dt=date('$v_date')
 	where stat_dt in ctr_nbr
 ;
+
+create local temporary table tmp_prob_ris_fee
+on commit preserve rows as select * from etl_cfg.dbt_zh__map where 1>2;
 
 insert INTO mgr_fat_mbl_first_page_channel_day(
 	 stat_dt                 ,fst_chnl_cd             ,tdy_crd_cust_cnt       --日期

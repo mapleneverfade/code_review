@@ -26,7 +26,7 @@ class load_sql():
         with open(filepath, 'rb') as f:
             for line in f:
                 pattern = '--.*?\n'                #懒惰匹配注释
-                i = re.sub(pattern, '', line.decode('utf8'))
+                i = re.sub(pattern, '', line.decode('utf8','ignore'))
                 self._sql_no_note = f'{self._sql_no_note} {i.strip()}'
         if not self._sql_no_note:
             raise(Exception('loading error!'))   # 导入SQL脚本异常。
