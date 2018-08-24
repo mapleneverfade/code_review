@@ -25,6 +25,7 @@ INSERT INTO tmp_mgr_fat_mbl_first_page_channel_day
 	,7D_APV_PAS_CRD_CNT      -- 7天审批通过 
 	,7D_VLD_APV_CPL_CUST_CNT -- 7天审批结案	                                           
 );
+select * from ceo_management_month;
 INSERT INTO mgr_dim.page_channel_day
 (
 	 stat_dt                 ,fst_chnl_cd             ,tdy_crd_cust_cnt       -- 日期，           渠道，           授信客户数（获客数）
@@ -38,6 +39,9 @@ INSERT INTO mgr_dim.page_channel_day
 	,7D_APV_PAS_CRD_CNT      -- 7天审批通过 
 	,7D_VLD_APV_CPL_CUST_CNT -- 7天审批结案	                                           
 );
+
+select * from ceo_management_day;
+
 INSERT INTO mgr_fat_mbl_first_page_channel_day
 (
 	 stat_dt                 ,fst_chnl_cd             ,tdy_crd_cust_cnt       -- 日期，           渠道，           授信客户数（获客数）

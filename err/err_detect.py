@@ -72,7 +72,7 @@ class err_detector():
         self._sql = sql
 
     def select_err(self, sql):
-        pattern = 'select\s*\\*'
+        pattern = 'select[^\S]*?\\*'
         result = re.search(pattern, sql, re.IGNORECASE)
         if result:
             self.global_exception['select *'] = True
@@ -81,7 +81,7 @@ class err_detector():
 
     def count_err(self, sql):
         #pattern = 'count\s*\\*'
-        pattern = 'count[\\(|\s)]+?\\*'            # 懒惰匹配 count *
+        pattern = 'count[\\(|\s]+?\\*'            # 懒惰匹配 count *
         result = re.search(pattern, sql, re.IGNORECASE)
         if result:
             self.global_exception['count *'] = True
@@ -98,7 +98,7 @@ class err_detector():
 
     # case...when...then...else...     情况可能较复杂，此处只检测一个case语句中是否存在else
     def case_no_else_err(self, sql):
-        case_pattern = 'case'
+        case_pattern = 'case\s+when'
         else_pattern = 'else'
         # sql语句中有case而无else异常置True
         if re.search(case_pattern, sql, re.IGNORECASE) and not re.search(else_pattern, sql, re.IGNORECASE):
@@ -120,7 +120,7 @@ class err_detector():
             pass
 
     def not_between_err(self, sql):
-        pattern = 'not.*between'
+        pattern = 'not[^\S]+between'   # ^\S 匹配空白字符
         result = re.search(pattern, sql, re.IGNORECASE)
         if result:
             self.global_exception['not_between'] = True
@@ -281,8 +281,8 @@ class err_detector():
 
             self.insert_set.add(len(self.target_field[name_+'_insert']))
             self.select_set.add(len(self.target_field[name_+'_select']))
-            print(self.target_field, self.tmp_field)
-            print(self.insert_set,self.select_set,self.create_set)
+            #print(self.target_field, self.tmp_field)
+            #print(self.insert_set,self.select_set,self.create_set)
 
     '''
         where 条件字段函数判断需要更改逻辑，适配不同脚本情况。
@@ -314,6 +314,7 @@ class err_detector():
                 func_pattern = f'{func_}\\(.*?\\)'
                 func_detect_result = re.search(func_pattern, concat, re.IGNORECASE)
                 if func_detect_result:
+                    print(func_detect_result.group(0))
                     self.global_exception['where_exist_function'] = True
 
     # 检测是否grant语句。

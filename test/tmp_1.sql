@@ -1,4 +1,4 @@
-CREATE TABLE neo_fake.ceo_management_month(
+CREATE local temporary  TABLE neo_fake.ceo_management_month(
 	stat_dt Date NOT NULL DEFAULT '1900-01-01'::date,
 	fst_org_nbr Varchar(10) NOT NULL DEFAULT '',
 	fst_crd_dt Date Not NULL default '1900-01-01'::date,
@@ -173,16 +173,16 @@ INSERT INTO mgr_fat_mbl_first_page_channel_day
 )
 
 select 
-	 date'$v_date'           ,fst_chnl_cd             ,tdy_crd_cust_cnt
+	 date'$v_date'           ,fst_chnl_cd             ,distinct tdy_crd_cust_cnt
 	,new_dtrb_amt            ,rep_dtrb_amt            ,rpay_amt               -- 新借贷款余额,    复借贷款余额，   还款总金额
-	,prcp_bal                ,tdy_add_prcp_bal        ,ovd_prcp_bal           -- 贷款余额,        净增余额,        逾期金额
+	,prcp_bal                ,tdy_add_prcp_bal        ,distinct ovd_prcp_bal           -- 贷款余额,        净增余额,        逾期金额
 	,apl_cust_cnt            ,tdy_apv_pas_cust        ,vld_apv_cpl_cust_cnt   -- 申请用户数,      审批通过客户,    审批结案
 
-	,sum(tdy_crd_cust_cnt)       -- 近7日获客数
+	,distinct sum(tdy_crd_cust_cnt)       -- 近7日获客数
 	,sum(tdy_add_prcp_bal)       -- 近7日净增余额 
 	,sum(apl_cust_cnt)           -- 7天申请用户数
 	,sum(tdy_apv_pas_cust)       -- 7天审批通过数
-	,sum(vld_apv_cpl_cust_cnt)   -- 7天审批结案数
+	,distinct sum(vld_apv_cpl_cust_cnt)   -- 7天审批结案数
 	
 from mgr_fat.ceo_management_day
 where stat_dt > date'$v_date' - interval '7 day'
@@ -280,15 +280,15 @@ select
 	,prcp_bal                ,tdy_add_prcp_bal        ,ovd_prcp_bal           -- 贷款余额,        净增余额,        逾期金额
 	,apl_cust_cnt            ,tdy_apv_pas_cust        ,vld_apv_cpl_cust_cnt   -- 申请用户数,      审批通过客户,    审批结案
 
-	,sum(tdy_crd_cust_cnt)       -- 近7日获客数
-	,sum(tdy_add_prcp_bal)       -- 近7日净增余额 
+	,case when a>0 then sum(tdy_crd_cust_cnt)  end     -- 近7日获客数
+	,case when b<> 0 then sum(tdy_add_prcp_bal)  end    -- 近7日净增余额 
 	,sum(apl_cust_cnt)           -- 7天申请用户数
 	,sum(tdy_apv_pas_cust)       -- 7天审批通过数
 	,sum(vld_apv_cpl_cust_cnt)   -- 7天审批结案数
 	,sysdate
 	
 from mgr_fat.ceo_management_day
-where stat_dt > date'$v_date' - interval '7 day'
+where  not between stat_dt > date'$v_date' - interval '7 day'
 	and stat_dt <= date'$v_date'
   
 group by

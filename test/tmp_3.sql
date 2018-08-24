@@ -4,7 +4,7 @@
 --这也是注释
 CREATE LOCAL TEMPORARY TABLE tmp_fake_tab_1(
 		stat_dt date
-) on commit preserve rows
+) 
 ;
 CREATE LOCAL TEMPORARY TABLE tmp_fake_tab_2(
 		stat_dt date
@@ -118,6 +118,7 @@ insert INTO mgr_fat_mbl_first_page_channel_day(
 	,7D_VLD_APV_CPL_CUST_CNT --7天审批结案	                                           
 );
 
+select count * from ceo_management_day;
 
 INSERT  into mgr_dim.mbl_second_channel_day
 
@@ -135,12 +136,12 @@ INSERT  into mgr_dim.mbl_second_channel_day
 )
 
 select 
-	 date'$v_date'           ,fst_chnl_cd             ,tdy_crd_cust_cnt
-	,new_dtrb_amt            ,rep_dtrb_amt            ,rpay_amt               --新借贷款余额
+	 date'$v_date'           ,distinct fst_chnl_cd             ,tdy_crd_cust_cnt
+	,new_dtrb_amt            ,rep_dtrb_amt            ,distinct rpay_amt               --新借贷款余额
 	,prcp_bal                ,tdy_add_prcp_bal        ,ovd_prcp_bal           --贷款余额
-	,apl_cust_cnt            ,tdy_apv_pas_cust        ,vld_apv_cpl_cust_cnt   --申请用户数
+	,apl_cust_cnt            ,distinct tdy_apv_pas_cust        ,distinct vld_apv_cpl_cust_cnt   --申请用户数
 
-	,case sum(tdy_crd_cust_cnt)  when      --近7日获客数
+	,case when sum(tdy_crd_cust_cnt)       --近7日获客数
 	,sum(tdy_add_prcp_bal)       --近7日净增余额 
 	,sum(apl_cust_cnt)           --7天申请用户数
 	,sum(tdy_apv_pas_cust)       --天审批通过数
@@ -177,18 +178,16 @@ select
 	,prcp_bal                ,distinct tdy_add_prcp_bal        ,ovd_prcp_bal           --贷款余额
 	,apl_cust_cnt            ,distinct tdy_apv_pas_cust        ,to_char(vld_apv_cpl_cust_cnt,'world')   --申请用户数
 	
-	,sum(tdy_crd_cust_cnt)       --近7日获客数
-	,sum(tdy_add_prcp_bal)       --近7日净增余额 
+	,sum(tdy_crd_cust_cnt)       --近7日获客数 额 
 	,sum(apl_cust_cnt)           --7天申请用户数
 	,sum(tdy_apv_pas_cust)       --7天审批通过数
 	,sum(vld_apv_cpl_cust_cnt)   --7天审批结案数
-
 
 from mgr_fat.ceo_management_day 
 join 
      ceo_management_month on a = b
 outer	
-where stat_dt > date'$v_date' - interval '7 day'
+where not between stat_dt > date'$v_date' - interval '7 day'
 	 not    between a and b
 	and to_char(stat_dt) <= date'$v_date'
   
@@ -196,4 +195,3 @@ group by
 	date('$v_date'), fst_chnl_cd
 ;
 select * from mgr_fat.ceo_management_day;
-

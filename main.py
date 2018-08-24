@@ -4,7 +4,7 @@ from utils.load_and_transform import load_sql
 from options import Options
 from err.err_detect import err_detector
 from err.err_print import err_printer
-
+from err.err_locate import err_locater
 '''
     扫描parser.foldername目录下的所有文本，输出扫描结果。
     
@@ -26,7 +26,11 @@ class code_review():
         for file in filelist:
             print('********{} 检测中 ********\n'.format(file))
             filepath = os.path.join(self.parser.folderName, file)
-            sql = self.loader.load_delete_note(filepath)              # 导入去注释SQL文本
+            sql = self.loader.load_delete_note(filepath)                # 导入去注释SQL文本
+
+            locater = err_locater(self.loader.load_sql_origin(filepath))          # locater接收原脚本文件
+            locater.execute()
+
             statement = sql.split(';')
             #self.detector = err_detector(sql, statement)
             self.detector.sql, self.detector.statement = sql, statement
