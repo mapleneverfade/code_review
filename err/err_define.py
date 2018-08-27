@@ -1,10 +1,60 @@
 #-*- utf-8 -*-
+from copy import deepcopy
 '''
     code review异常定义。
 '''
 #   异常定义类
+'''
+    本文件定义异常类，
+    1、err_detect类中全局异常
+    2、err_locate类中定位异常字典
+'''
+
+err_dic = {
+            'select *'                       :[],      # yes
+            'count *'                        :[],      # yes
+            'flag_distinct'                 :[],      # yes
+            'case_no_else'                  :[],      # yes
+            'join_no_outer_inner'          :[],      # yes
+            'not_between'                   :[],      # yes
+            'multi_target'                  :[],
+            'multi_insert_target'          :[],
+            'etl_tms'                        :[],
+            'no_on_commit_preserve_rows'  :[],      # yes
+            'create_multi_tmp_table'       :[],
+            'drop_tmp_table'                :[],
+            'update_target'                 :[],
+            'explicit_field'                :[],
+            'where_exist_function'         :[]
+        }
+
+global_exception = {  # 统计全局错误
+    'select *': False,  # 全局范围
+    'count *': False,  # 全局范围
+    'flag_distinct': False,  # 单条语句包含多余三条distinct             全局范围
+    'case_no_else': False,  # case语句缺失else分支                     全局范围
+    'join_no_outer_inner': 0,  # join未指定outer、inner                   全局范围
+    'not_between': 0,  # 出现NOT BETWEEN                          全局范围
+
+    'multi_target': 0,  # 操作多目标表                             目标表
+    'multi_insert_target': 0,  # 多次插入目标表                           目标表
+    'etl_tms': False,  # 未显式更新etl_tms                        目标表
+
+    'no_on_commit_preserve_rows': 0,  # 创建临时表未使用on commit preserve rows  临时表
+    'create_multi_tmp_table': 0,  # 创建多临时表                             临时表
+    'drop_tmp_table': 0,  # 未显式销毁临时表                         临时表
+
+    'update_target': False,  # 采用update更新目标表
+
+    'explicit_field': False,
+    'where_exist_function': False
+}
+
+
 class error_define():
     def __init__(self):
+        self.err_dic = deepcopy(err_dic)
+        self.global_exception = global_exception
         self.exception = {
             'select':                      Exception("       SQL 程序中包含 'SELECT *'"),  # yes
             'multi-temp-table':           Exception('       SQL 脚本创建两个以上临时表'),  # yes

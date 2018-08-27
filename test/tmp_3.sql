@@ -12,7 +12,7 @@ CREATE LOCAL TEMPORARY TABLE tmp_fake_tab_2(
 ;
 CREATE LOCAL TEMPORARY TABLE tmp_fake_tab_3(
 		stat_dt date
-) on commit preserve rows
+) 
 ;
 
 create local temporary table mgr_dim.mbl_second_channel_monday
@@ -50,6 +50,15 @@ CREATE local temporary table  tmp_neo_fake.it_is_there(
 )on commit preserve rows;
 
 CREATE local temporary table  tmp_neo_fake.it_is_forth(
+	stat_dt Date NOT NULL DEFAULT '1900-01-01'::date,
+	fst_org_nbr Varchar(10) NOT NULL DEFAULT '',
+	fst_crd_dt Date Not NULL default '1900-01-01'::date,
+	fst_crd_situ_cd Varchar(200) NOT NULL DEFAULT ''
+
+)on commit preserve rows;
+
+
+CREATE local temporary table  tmp_neo_fake.it_is_fifth(
 	stat_dt Date NOT NULL DEFAULT '1900-01-01'::date,
 	fst_org_nbr Varchar(10) NOT NULL DEFAULT '',
 	fst_crd_dt Date Not NULL default '1900-01-01'::date,

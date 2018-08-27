@@ -7,27 +7,6 @@ from .func_dic import function
 '''
 	重构err_detect代码。
 '''
-global_exception = {  # 统计全局错误
-    'select *': False,  # 全局范围
-    'count *': False,  # 全局范围
-    'flag_distinct': False,  # 单条语句包含多余三条distinct             全局范围
-    'case_no_else': False,  # case语句缺失else分支                     全局范围
-    'join_no_outer_inner': 0,  # join未指定outer、inner                   全局范围
-    'not_between': 0,  # 出现NOT BETWEEN                          全局范围
-
-    'multi_target': 0,  # 操作多目标表                             目标表
-    'multi_insert_target': 0,  # 多次插入目标表                           目标表
-    'etl_tms': False,  # 未显式更新etl_tms                        目标表
-
-    'no_on_commit_preserve_rows': 0,  # 创建临时表未使用on commit preserve rows  临时表
-    'create_multi_tmp_table': 0,  # 创建多临时表                             临时表
-    'drop_tmp_table': 0,  # 未显式销毁临时表                         临时表
-
-    'update_target': False,  # 采用update更新目标表
-
-    'explicit_field': False,
-    'where_exist_function': False
-}
 
 '''
 	ToDo:
@@ -36,7 +15,8 @@ global_exception = {  # 统计全局错误
 
 # 异常检测器，负责检测异常，返回结果至error_detect.global_exception
 class err_detector():
-    def __init__(self, sql = None, statement = None):
+    def __init__(self, sql = None, statement = None,locater = None):
+        self.err_define = error_define()
         self.isRight = True                             # 全局flag，SQL脚本是否存在异常语句
         self._statement = statement                       # 分割后的SQL语句
         self._sql = sql
@@ -45,7 +25,7 @@ class err_detector():
         self.tmp_field = {}
         self.target_field = {}                                  # 分割后的字段 {'table_name':field list}
 
-        self.global_exception = global_exception.copy()  # 全局异常检测副本
+        self.global_exception = self.err_define.global_exception.copy()  # 全局异常检测副本
         self.local_table_name = {}                       # 记录目标表名与写入次数
         self.local_exception = {}                        # 暂未使用 Todo
         self.target_table_statement = []                 # 记录包含目标表的语句，后续处理
@@ -57,6 +37,22 @@ class err_detector():
         self.select_set = set()                          #记录select字段数
 
         self.split_to_field = statement_to_field()
+
+        #新增属性，辅助err_locate定位目标表操作异常。
+        self.manipulate_target = {'delete':set(),
+                                  'update':set(),
+                                  'insert':set()
+                                  }
+        # 辅助定位where条件字段函数。
+        self.where_func = {
+                'isExist': False,
+                'function':[]
+            }
+        # 辅助定位create|insert|select未显示提供字段语句。
+        self.implicit_field = {
+                'create':None,    # create语句是否未显式指定字段。
+                'insert':None     # insert|select语句是否未显式指定字段。
+        }
     # 正则匹配select *,若存在，置global_exception为 True
     @property
     def statement(self):
@@ -170,18 +166,23 @@ class err_detector():
         delete_pattern = '^delete.*from'
         delete_ = re.search(delete_pattern, sql.strip(), re.IGNORECASE)
         if delete_:
-            table_name = sql.replace(delete_.group(0), '').strip().split(' ')[0].strip()
+            table_name = sql.lower().replace(delete_.group(0), '').strip().split(' ')[0].strip()
             if not self.is_temp_table(table_name) and table_name not in self.target_table_name:                # 表名为目标表
                 self.target_table_name.append(table_name)
                 self.global_exception['multi_target'] += 1
+
+                self.manipulate_target['delete'].add(table_name)
 
     def update_target_detect(self, sql):
         update_pattern = '^update'
         update_ = re.search(update_pattern, sql.strip(), re.IGNORECASE)
         if update_:
-            table_name = sql.replace('update', '').strip().split(' ')[0].strip()
+            table_name = sql.lower().replace('update', '').strip().split(' ')[0].strip()
             if not self.is_temp_table(table_name) and table_name not in self.target_table_name:                # 表名为目标表
                 self.target_table_name.append(table_name)
+
+                self.manipulate_target['update'].add(table_name)
+
                 self.global_exception['update_target'] = True   #是否update目标表
                 self.global_exception['multi_target'] += 1
     '''
@@ -199,6 +200,8 @@ class err_detector():
                 if not self.is_temp_table(table_name) and table_name not in self.target_table_name:
                     self.target_table_name.append(table_name)
                     self.global_exception['multi_target'] += 1       # 多目标表
+
+                    self.manipulate_target['insert'].add(table_name)
 
                 #多次写入目标表。
                 if not self.is_temp_table(table_name):
@@ -257,9 +260,9 @@ class err_detector():
     # 考虑重构功能，将提取字段与对比功能抽象为新类。
 
     def explicit_field(self):
-        #self.tmp_field — self.target_field
-        #self.tmp_create_statement — self.target_table_statement
-        #提取 tmp_table 名
+        # self.tmp_field — self.target_field
+        # self.tmp_create_statement — self.target_table_statement
+        # 提取 tmp_table 名
 
         for i in self.tmp_create_statement:
             name_ = self.extract_table_name(i, 'temp')
@@ -267,11 +270,15 @@ class err_detector():
 
             self.split_to_field.statement = i
             middle_param = self.split_to_field.to_field('temp')
-            if middle_param:
+            if middle_param:                                           # 提取创建临时表中间字段，若为空，则说明未显式指定字段。
                 self.tmp_field[name_] = middle_param
                 self.create_set.add(len(self.tmp_field[name_]))
-            else:                                              # 创建临时表未显式提供字段。
+            else:                                                      # 创建临时表未显式提供字段。
                 self.global_exception['explicit_field'] = True      # 直接置错
+                '''
+                新增部分，辅助检测insert|select字段是否未显式指定字段
+                '''
+                self.implicit_field['create'] = (True, name_)        # create语句未显式提供字段，将表名传递给err_locate.
 
         for i in self.target_table_statement:
             name_ = self.extract_table_name(i, 'target')
@@ -279,10 +286,15 @@ class err_detector():
             self.split_to_field.statement = i
             self.target_field[name_ + '_insert'], self.target_field[name_ + '_select'] = self.split_to_field.to_field('target')
 
+
+
             self.insert_set.add(len(self.target_field[name_+'_insert']))
             self.select_set.add(len(self.target_field[name_+'_select']))
             #print(self.target_field, self.tmp_field)
             #print(self.insert_set,self.select_set,self.create_set)
+            if len(self.target_field[name_+'_insert']) != len(self.target_field[name_+'_select']):
+                self.implicit_field['insert'] = (True, name_)
+
 
     '''
         where 条件字段函数判断需要更改逻辑，适配不同脚本情况。
@@ -316,6 +328,8 @@ class err_detector():
                 if func_detect_result:
                     print(func_detect_result.group(0))
                     self.global_exception['where_exist_function'] = True
+                    self.where_func['isExist'] = True
+                    self.where_func['function'].append(func_detect_result.group(0))
 
     # 检测是否grant语句。
     def is_grant(self, sql):
@@ -362,17 +376,19 @@ class err_detector():
         if not (self.insert_set == self.select_set and self.create_set&self.insert_set):  #若create与select或insert字段数不一致，则置error
             self.global_exception['explicit_field'] = True
 
+        #传递参数　self.manipulate_target  self.global_exception 至 err_locater
+
         return self.global_exception
 
     # 重置变量。
     def clear(self):
         self.isRight = True                             # 全局flag，SQL脚本是否存在异常语句
-        self.statement = []                       # 分割后的SQL语句
+        self.statement = []                              # 分割后的SQL语句
         self.sql = ''
         self.tmp_create_statement = []
         self.tmp_field = {}
         self.target_field = {}                           # 分割后的字段 {'table_name':field list}
-        self.global_exception = global_exception.copy()  # 全局异常检测副本
+        self.global_exception = self.err_define.global_exception.copy()  # 全局异常检测副本
         self.local_table_name = {}                       # 记录目标表名与写入次数
         self.local_exception = {}                        # 暂未使用 Todo
         self.target_table_statement = []                 # 记录包含目标表的语句，后续处理
@@ -382,6 +398,15 @@ class err_detector():
         self.insert_set = set()                          #记录插入目标表字段数
         self.select_set = set()                          #记录select字段数
         self.split_to_field = statement_to_field()
+        self.manipulate_target = {
+                                  'delete':set(),
+                                  'update':set(),
+                                  'insert':set()
+                                  }
+        self.where_func = {
+                'isExist': False,
+                'function':[]
+            }
     '''
         去掉所有注释，排除检测干扰。
     '''

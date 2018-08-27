@@ -1,34 +1,25 @@
 #-*-coding:utf8-*-
 import re
+from copy import deepcopy
+from .err_define import error_define
+
 '''
     本程序负责定位扫描脚本异常位置。
     1、记录每行对应的行数。
     2、发现异常提取行数。
-    3、
-'''
-err_dic = {
-            'select *'                       :[],      # yes
-            'count *'                        :[],      # yes
-            'flag_distinct'                 :[],      # yes
-            'case_no_else'                  :[],      # yes
-            'join_no_outer_inner'          :[],      # yes
-            'not_between'                   :[],      # yes
-            'multi_target'                  :[],
-            'multi_insert_target'          :[],
-            'etl_tms'                        :[],
-            'no_on_commit_preserve_rows'  :[],      # yes
-            'create_multi_tmp_table'       :[],
-            'drop_tmp_table'                :[],
-            'update_target'                 :[],
-            'explicit_field'                :[],
-            'where_exist_function'         :[]
-        }
 
+'''
 class err_locater():
-    def __init__(self,sql=None):
+    def __init__(self,sql=None, target_table_name=None, global_exception=None, where_func = None,implicit_field = None):
+        self.err_define = error_define()
         self.sql_dic = None     # 脚本字典，每一元素对应一行。
         self._sql = sql
-        self.err_dic = err_dic.copy()
+        self.err_dic = deepcopy(self.err_define.err_dic)   #　须采用深拷贝
+
+        self.target_table_name = target_table_name
+        self.global_exception = global_exception
+        self.where_function = where_func
+        self.implicit_field = implicit_field
 
     @property
     def sql(self):
@@ -42,11 +33,11 @@ class err_locater():
     def select_locate(self):
         pattern = 'select[\s]+?\\*'
         blank_pattern = '\n'
-        if re.search(pattern, self.sql, re.IGNORECASE):                 # 脚本存在此异常
+        if re.search(pattern, self.sql, re.IGNORECASE):                 # 若待检脚本存在此异常
             for i in re.finditer(pattern, self.sql, re.IGNORECASE):    # 统计匹配结果字符前所有换行符'\n',即为行数
                 row_num = len(re.findall(blank_pattern, self.sql[:i.start()], re.IGNORECASE))+1
                 self.err_dic['select *'].append(row_num)
-                print(f'select 异常{row_num}')
+        print(f'select * 异常行数 : {self.err_dic["select *"]}')
     '''
         完成
     '''
@@ -57,7 +48,7 @@ class err_locater():
             for i in re.finditer(pattern, self.sql, re.IGNORECASE):
                 row_num = len(re.findall(blank_pattern, self.sql[:i.start()], re.IGNORECASE))+1
                 self.err_dic['count *'].append(row_num)
-                print(f'count 异常{row_num}')
+        print(f'count * 异常行数 : {self.err_dic["count *"]}')
     '''
         多distinct语句的检测，不能采用同其他异常相同的检测方式，
         distinct会在多行出现多次，只能通过限定正则检测范围来定位错误。
@@ -72,7 +63,7 @@ class err_locater():
         distinct_pattern = 'distinct'
         blank_pattern = '\n'
 
-        select_result = re.finditer(select_pattern, self.sql, re.IGNORECASE)
+        select_result = re.finditer(select_pattern, self.sql, re.IGNORECASE)           # 提取脚本中所有 select...; 之间的内容
 
         for select_statement in select_result:
             if len(re.findall(distinct_pattern, select_statement.group(0), re.IGNORECASE)) > 3:                          # 若一段语句distinct超过3个
@@ -83,10 +74,9 @@ class err_locater():
 
                 row_num = row_num_select + row_num_distinct   # distinct 所处行数
                 self.err_dic['flag_distinct'].append(row_num)
-
-                print(f'distinct error 行数:{row_num}')
             else:
                 pass
+        print(f'multi-distinct error 异常行数 : {self.err_dic["flag_distinct"]}')
     '''
         处理方式同 distinct_locate 
     '''
@@ -112,11 +102,11 @@ class err_locater():
 
                 row_num = row_num_select + row_num_case   # distinct 所处行数
                 self.err_dic['case_no_else'].append(row_num)
-
-                print(f'case no else error 行数:{row_num}')
             else:
                 pass
-    # 完成
+        print(f'case no else error 异常行数 : {self.err_dic["case_no_else"]}')
+
+    # 完成 检测方式同select * | count *
     def not_between_locate(self):
         not_between_pattern = 'not\s+between'
         blank_pattern = '\n'
@@ -124,7 +114,8 @@ class err_locater():
             for i in re.finditer(not_between_pattern, self.sql, re.IGNORECASE):    # 统计匹配结果字符前所有换行符'\n',即为行数
                 row_num = len(re.findall(blank_pattern, self.sql[:i.start()], re.IGNORECASE))+1
                 self.err_dic['not_between'].append(row_num)
-                print(f'not between 异常{row_num}')
+        print(f'not between 异常行数 : {self.err_dic["not_between"]}')
+
     '''
         类似于distinct检测，先提取create...; 之间内容，再检测。
     '''
@@ -139,25 +130,21 @@ class err_locater():
         create_result = re.finditer(create_pattern, self.sql, re.IGNORECASE)          # 提取 create...; 部分语句
 
         for create_statement in create_result:
-            #print(create_statement.group(0))
-            local_table_result = re.search(local_table_pattern, create_statement.group(0), re.IGNORECASE)
-            commit_result = re.search(commit_pattern, create_statement.group(0), re.IGNORECASE)
+            local_table_result = re.search(local_table_pattern, create_statement.group(0), re.IGNORECASE)     # 判断是否是临时表，即是否存在关键字 local temporary...
+            commit_result = re.search(commit_pattern, create_statement.group(0), re.IGNORECASE)               # 判断是否存在关键字 on commit rows
 
             if local_table_result and not commit_result:
-                row_num_local = len(re.findall(blank_pattern, self.sql[:create_statement.start()], re.IGNORECASE)) + 1
+                row_num_local = len(re.findall(blank_pattern, self.sql[:create_statement.start()], re.IGNORECASE)) + 1    # 统计 create 段所处行数
                 row_num_commit = len(re.findall(blank_pattern, create_statement.group(0)[:local_table_result.start()],
                                               re.IGNORECASE))
                 row_num = row_num_local + row_num_commit
                 self.err_dic['no_on_commit_preserve_rows'].append(row_num)
-                print(f'no on commit error 行数:{row_num}')
-
             else:
                 pass
-
-
+        print(f'no on commit error 异常行数 : {self.err_dic["no_on_commit_preserve_rows"]}')
 
     def join_locate(self):
-        select_pattern = 'select(.|\n)+?;'   # 注意惰性匹配
+        select_pattern = 'select(.|\n)+?;'   # 匹配 select...; 之间的内容，注意惰性匹配
         join_pattern = 'join'
         inner_pattern = 'inner'
         outer_pattern = 'outer'
@@ -171,18 +158,183 @@ class err_locater():
 
             if join_result and not (inner_result or outer_result):
                 row_num_select = len(re.findall(blank_pattern, self.sql[:select_statement.start()],
-                                                re.IGNORECASE)) + 1  # 计算 select 行数
+                                                re.IGNORECASE)) + 1                                # 统计 select 行数
 
-                join_result = re.search(join_pattern, select_statement.group(0))  # 检测异常语句中第一个 distinct 位置
-                row_num_join = len(re.findall(blank_pattern, select_statement.group(0)[
-                                                             :join_result.start()]))  # 计算 distinct 在段内偏移, 不用加 1
+                join_result = re.search(join_pattern, select_statement.group(0))
+                row_num_join = len(re.findall(blank_pattern,
+                                              select_statement.group(0)[:join_result.start()]))  # 计算 join 在段内偏移, 不用加 1
 
                 row_num = row_num_select + row_num_join  # distinct 所处行数
                 self.err_dic['join_no_outer_inner'].append(row_num)
-
-                print(f'join_no_outer_inner error 行数:{row_num}')
             else:
                 pass
+        print(f'join_no_outer_inner error 异常行数 : {self.err_dic["join_no_outer_inner"]}')
+
+    '''
+        创建多临时表异常。
+    '''
+    '''
+        完成
+    '''
+    def multi_tmp_table_locate(self):
+        create_tmp_pattern = 'create.+?local.+?temporary'
+        blank_pattern = '\n'
+        create_tmp_result = re.finditer(create_tmp_pattern, self.sql, re.IGNORECASE)
+        for create_tmp_statement in create_tmp_result:
+            row_num = len(re.findall(blank_pattern, self.sql[:create_tmp_statement.start()], re.IGNORECASE)) + 1  #　统计创建临时表行数
+            self.err_dic['create_multi_tmp_table'].append(row_num)      # 需要统计列表内容是否大于2
+
+            # 若大于2，则输出所有临时表行数
+        print(f'多临时表 异常行数 : {self.err_dic["create_multi_tmp_table"]}')
+
+
+    '''
+        操作多目标表,
+        返回所有操作目标表的行数
+    '''
+    def manipulate_multi_target_table_locate(self):
+        blank_pattern = '\n'
+        mani_target_table = set()
+        if len(self.target_table_name['delete']) > 0:
+            for delete_target_table_name in self.target_table_name['delete']:
+                delete_pattern = f'delete(.|\n)+{delete_target_table_name}(.|\n)+?;'
+                delete_result = re.search(delete_pattern, self.sql, re.IGNORECASE)
+                row_num = len(re.findall(blank_pattern, self.sql[:delete_result.start()], re.IGNORECASE)) + 1
+                mani_target_table.add(row_num)
+                #print(f'delete target table error 异常行数 : {row_num}')
+
+        if len(self.target_table_name['update']) > 0:
+            for update_target_table_name in self.target_table_name['update']:
+                update_pattern = f'update(.|\n)+{update_target_table_name}(.|\n)+?;'
+                update_result = re.finditer(update_pattern, self.sql, re.IGNORECASE)
+                for update_ in update_result:
+                    row_num = len(re.findall(blank_pattern, self.sql[:update_.start()], re.IGNORECASE)) + 1
+                    mani_target_table.add(row_num)
+                    #print(f'update target table error 异常行数 : {row_num}')
+
+        if len(self.target_table_name['insert']) > 0:
+            for insert_target_table_name in self.target_table_name['insert']:
+                insert_pattern = f'insert\s+?into\s+{insert_target_table_name}'
+                insert_result = re.finditer(insert_pattern, self.sql, re.IGNORECASE)
+                for insert_ in insert_result:
+                    row_num = len(re.findall(blank_pattern, self.sql[:insert_.start()], re.IGNORECASE)) + 1
+                    mani_target_table.add(row_num)
+                    #print(f'insert target table error 异常行数 : {row_num}')
+        print(f'manipulate multi-target table error 异常行数 : {mani_target_table}')
+        self.err_dic['multi_target'].append(mani_target_table)
+
+    '''
+        多次写入目标表
+    '''
+    '''
+        完成
+    '''
+    def multi_insert_target(self):
+        blank_pattern = '\n'
+        multi_insert_target_row = set()
+        for multi_insert_target in self.target_table_name['insert']:
+            insert_pattern = f'insert\s+?into\s+{multi_insert_target}'
+            multi_insert_result = re.finditer(insert_pattern, self.sql, re.IGNORECASE)
+            if len(re.findall(insert_pattern, self.sql, re.IGNORECASE)) > 1:
+                for insert_ in multi_insert_result:
+                    row_num = len(re.findall(blank_pattern, self.sql[:insert_.start()], re.IGNORECASE)) + 1
+                    multi_insert_target_row.add(row_num)
+                    # print(f'insert target table error 异常行数 : {row_num}')
+            else:
+                pass
+        self.err_dic['multi_insert_target'].append(multi_insert_target_row)
+        print(f'multi-insert target table error 异常行数 : {multi_insert_target_row}')
+
+    '''
+        update 目标表
+        接收err_detect传递的update与目标表名信息，检测update段。
+    '''
+    '''
+        完成
+    '''
+    def update_target_locate(self):
+        blank_pattern = '\n'
+        for target_table_name in self.target_table_name['update']:
+            update_pattern = f'update(.|\n)+{target_table_name}(.|\n)+?;'  # 提取update目标表达的语句。
+            update_result = re.search(update_pattern, self.sql, re.IGNORECASE)
+
+            row_num = len(re.findall(blank_pattern, self.sql[:update_result.start()], re.IGNORECASE)) + 1
+            print(f'update target table error 异常行数 : {row_num}')
+            self.err_dic['update_target'].append(row_num)
+        print(f'update目标表 异常行数 : {self.err_dic["update_target"]}')
+
+    '''
+        未显式赋值 etl_tms
+        1、定位 insert target—table 语句
+        2、检测 insert 语句是否包含 etl_tms 而不包含 sysdate
+    '''
+    '''
+        完成
+    '''
+    def explicit_etl_tms_locate(self):
+        etl_tms_pattern = 'etl.*tms'
+        sysdate_pattern = 'sysdate'
+        blank_pattern = '\n'
+        for insert_target_table in self.target_table_name['insert']:
+            insert_pattern = f'insert\s+?into\s+{insert_target_table}(.|\n)*?;'
+            for insert_statement in re.finditer(insert_pattern, self.sql, re.IGNORECASE):
+                etl_tms_ = re.search(etl_tms_pattern, insert_statement.group(0), re.IGNORECASE)
+                sysdate_ = re.search(sysdate_pattern, insert_statement.group(0), re.IGNORECASE)
+                if etl_tms_ and not sysdate_:
+                    row_num = len(re.findall(blank_pattern, self.sql[:insert_statement.start()], re.IGNORECASE)) + 1
+                    self.err_dic['etl_tms'].append(row_num)
+        print(f'etl-tms no sysdate error 异常行数 : {self.err_dic["etl_tms"]}')
+
+    '''
+        insert|select|create未显式提供字段名。
+        定位方式：
+                err_detector传递检测结果，更具结果在原文定位。
+                {
+                    'create':( bool(是否异常), 'tmp_table_name'),
+                    'insert':( bool(是否异常), 'target_table_name')
+                }
+                
+    '''
+    def explicit_field_locate(self):
+        blank_pattern = '\n'
+        if self.implicit_field['create']:
+            print(self.implicit_field["create"][1])
+            create_tmp_pattern = f'create\s+local.*{self.implicit_field["create"][1]}?'
+
+            create_result = re.search(create_tmp_pattern, self.sql, re.IGNORECASE)
+
+            row_num_create = len(re.findall(blank_pattern, self.sql[:create_result.start()], re.IGNORECASE)) + 1            #　创建临时表未显示指定字段
+            self.err_dic['explicit_field'].append(row_num_create)
+        if self.implicit_field['insert']:
+            insert_target_pattern = f'insert\s+?into\s+?{self.implicit_field["insert"][1]}'
+            insert_result = re.search(insert_target_pattern, self.sql, re.IGNORECASE)
+            row_num_insert = len(re.findall(blank_pattern, self.sql[:insert_result.start()], re.IGNORECASE)) + 1
+            self.err_dic['explicit_field'].append(row_num_insert)
+        print(f'implicit field 异常行数 : {self.err_dic["explicit_field"]}')
+
+    '''
+        where字段存在函数
+        接收err_detector传递的函数检测结果，重回原文定位函数位置。PS：可能存在误检(注释部分、select部分等)
+        
+        定位检测结果依赖于检测，待修正。
+    '''
+    def where_exist_func_locate(self):
+        blank_pattern = '\n'
+        for func_ in self.where_function['function']:
+            function_pattern = f'{func_}'.replace('(', '\\(').replace(')','\\)')
+
+
+            func_result = re.finditer(function_pattern, self.sql, re.IGNORECASE)
+            #print(re.findall(tmp, self.sql, re.IGNORECASE))
+
+            for func_result_ in func_result:
+
+                row_num = len(re.findall(blank_pattern, self.sql[:func_result_.start()], re.IGNORECASE)) + 1
+               # multi_insert_target_row.add(row_num)
+                self.err_dic['where_exist_function'].append((func_, row_num))
+        print(f'where字段带函数 异常行数 : {self.err_dic["where_exist_function"]}')
+
+
     def execute(self):
         self.select_locate()
         self.count_locate()
@@ -192,8 +344,24 @@ class err_locater():
         self.not_between_locate()
         self.commit_preserve_rows_locate()
 
+        if len(self.target_table_name['update']) > 0:
+            self.update_target_locate()
+        target_name = self.target_table_name['delete'] | self.target_table_name['insert'] | self.target_table_name['update']
+        if len(target_name) > 1:
+            self.manipulate_multi_target_table_locate()   #　操作目标表数大于1
+
+        self.multi_tmp_table_locate()
+        self.multi_insert_target()
+
+        self.explicit_etl_tms_locate()
+        if self.where_function['isExist']:
+            self.where_exist_func_locate()
+
+        #self.explicit_field_locate()
+
+
     def clear(self):
-        self.err_dic = err_dic.copy()
+        self.err_dic = self.err_define.err_dic.copy()
 
 if __name__ == '__main__':
     load = err_locater('D:\\项目管理\\venv\\code-review\\test\\tmp_2.sql')
