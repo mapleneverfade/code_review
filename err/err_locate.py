@@ -7,13 +7,11 @@ from .err_define import error_define
     本程序负责定位扫描脚本异常位置。
     1、记录每行对应的行数。
     2、发现异常提取行数。
-
 '''
 '''
     Todo:
         修正定位，去除注释内容影响
 '''
-
 class err_locater():
     def __init__(self,sql=None, target_table_name=None, global_exception=None, where_func = None,implicit_field = None):
         self.err_define = error_define()
@@ -386,7 +384,7 @@ class err_locater():
 
 
     def execute(self):
-        self.remove_annotation()
+        self.remove_annotation()   # 移除注释
 
         self.select_locate()
         self.count_locate()
@@ -412,7 +410,6 @@ class err_locater():
         self.explicit_field_locate()
         #print(self.err_dic)
 
-
     def clear(self):
         self.err_dic = self.err_define.err_dic.copy()
 
@@ -427,4 +424,3 @@ if __name__ == '__main__':
         print(load.sql[i.start():i.end()])
         print(len(re.findall(blank_pattern, load.sql[:i.start()], re.IGNORECASE)))
 
-    #print(load.sql)
