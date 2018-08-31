@@ -182,7 +182,7 @@ class err_locater():
                 row_num_select = len(re.findall(blank_pattern, self.sql[:select_statement.start()],
                                                 re.IGNORECASE)) + 1                                # 统计 select 行数
 
-                join_result = re.search(join_pattern, select_statement.group(0))
+                join_result = re.search(join_pattern, select_statement.group(0), re.IGNORECASE)
                 row_num_join = len(re.findall(blank_pattern,
                                               select_statement.group(0)[:join_result.start()]))  # 计算 join 在段内偏移, 不用加 1
 

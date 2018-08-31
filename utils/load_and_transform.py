@@ -29,7 +29,7 @@ class load_sql():
         sql = ''                                          # 字符串置空
         with open(filepath, 'rb') as f:
             for line in f:
-                sql = f"{sql} {line.decode('utf8')}"    # 不去除空白字符
+                sql = f"{sql} {line.decode('utf8','ignore')}"    # 不去除空白字符
         if not sql:
             raise(Exception('loading error!'))         # 导入SQL脚本异常
         self.sql = sql

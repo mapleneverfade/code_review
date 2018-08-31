@@ -49,12 +49,7 @@ class code_review():
     测试是否parser.isFolder 布尔类型bug
 '''
 
-
 if __name__=='__main__':
     main = code_review()
     main.run()
 
-
-
-	print('test of git')
-	print('new branch')

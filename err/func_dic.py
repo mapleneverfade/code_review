@@ -22,7 +22,7 @@ function = {
         'DAYOFMONTH', 'QUARTER', 'HOUR', 'MINUTE', 'SECOND', 'EXTRACT', 'TIME_TO_SEC', 'SEC_TO_TIME',
         'TO_DAYS', 'FROM_DAYS', 'DATEDIFF', 'ADDDATE', 'DATE_ADD', 'SUBDATE', 'ADDTIME', 'SUBTIME',
         'DATE_FORMAT', 'TIME_FORMAT', 'GET_FORMAT',
-        'IF', 'IFNULL', 'VERSION', 'CONNECTION_ID', 'DATABASE', 'SCHEMA', 'USER', 'SYSTEM_USER',
+         'IFNULL', 'VERSION', 'CONNECTION_ID', 'DATABASE', 'SCHEMA', 'USER', 'SYSTEM_USER',
         'SESSION_USER', 'CURRENT_USER', 'CURRENT_USER', 'CHARSET', 'COLLATION', 'LAST_INSERT_ID',
         'PASSWORD', 'md5', 'ENCODE', 'DECODE', 'FORMAT', 'INET_ATON', 'INET_NTOA', 'GET_LOCK',
         'IS_FREE_LOCK', 'RELEASE_LOCK', 'BENCHMARK', 'CHARSET', 'CAST', 'CONVERT'
@@ -30,7 +30,7 @@ function = {
 
     'Vertica': [
         'truc', 'random', 'greatest', 'substr', 'to_char', 'day', 'month', 'year', 'week', 'quarter',
-        'ln', 'least', 'isnull', 'ascii', 'chr', 'lpad', 'rpad'
+        'ln', 'least', 'isnull', 'ascii', 'chr', 'lpad', 'rpad','to_number','nullif'
     ],
 
     'Hive': [

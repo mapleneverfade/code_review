@@ -166,7 +166,7 @@ class err_detector():
         delete_pattern = '^delete.*?from'       # 惰性匹配
         delete_ = re.search(delete_pattern, sql.strip(), re.IGNORECASE)
         if delete_:
-            table_name = sql.lower().replace(delete_.group(0), '').strip().split(' ')[0].strip()
+            table_name = sql.lower().replace(delete_.group(0).lower(), '').strip().split(' ')[0].strip()
             if not self.is_temp_table(table_name) and table_name not in self.target_table_name:                # 表名为目标表
                 self.target_table_name.append(table_name)
                 self.global_exception['multi_target'] += 1

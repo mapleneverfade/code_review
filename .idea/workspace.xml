@@ -2,25 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="34b2d1e3-424e-42d6-8b83-df6fe17b1764" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/code-review.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.pytest_cache/v/cache/lastfailed" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.pytest_cache/v/cache/nodeids" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/err/err_define.py" beforeDir="false" afterPath="$PROJECT_DIR$/err/err_define.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/err/err_detect.bak" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/err/err_detect.py" beforeDir="false" afterPath="$PROJECT_DIR$/err/err_detect.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/err/err_locate.py" beforeDir="false" afterPath="$PROJECT_DIR$/err/err_locate.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/err/err_print.py" beforeDir="false" afterPath="$PROJECT_DIR$/err/err_print.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/err/func_dic.py" beforeDir="false" afterPath="$PROJECT_DIR$/err/func_dic.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyvenv.cfg" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/result/检测结果.txt" beforeDir="false" afterPath="$PROJECT_DIR$/result/检测结果.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/tmp_1.sql" beforeDir="false" afterPath="$PROJECT_DIR$/test/tmp_1.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/tmp_3.sql" beforeDir="false" afterPath="$PROJECT_DIR$/test/tmp_3.sql" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/load_and_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/load_and_transform.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,7 +22,7 @@
     <SUITE FILE_PATH="coverage/code_review$err_define.coverage" NAME="err_define Coverage Results" MODIFIED="1534412426720" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/err" />
     <SUITE FILE_PATH="coverage/code_review$pytest_in_test_reconstruct_py.coverage" NAME="pytest in test_reconstruct.py Coverage Results" MODIFIED="1534812882551" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/code_review$func_dic.coverage" NAME="func_dic Coverage Results" MODIFIED="1534821174037" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/err" />
-    <SUITE FILE_PATH="coverage/code_review$main.coverage" NAME="main Coverage Results" MODIFIED="1535702548979" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/code_review$main.coverage" NAME="main Coverage Results" MODIFIED="1535711013621" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/code_review$load_and_cut.coverage" NAME="load_and_cut Coverage Results" MODIFIED="1534412505777" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/utils" />
     <SUITE FILE_PATH="coverage/code_review$Unnamed.coverage" NAME="Unnamed Coverage Results" MODIFIED="1533699709315" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/code_review$err_detect.coverage" NAME="err_detect Coverage Results" MODIFIED="1535075565964" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/err" />
@@ -56,29 +45,29 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="md" value="24" />
-          <entry key="py" value="55238" />
+          <entry key="md" value="433" />
+          <entry key="py" value="55270" />
           <entry key="sql" value="48" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Markdown" value="24" />
-          <entry key="Python" value="55237" />
+          <entry key="Markdown" value="433" />
+          <entry key="Python" value="55269" />
           <entry key="SQL" value="49" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.js.language.service.starts" />
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="md" value="1" />
+          <entry key="md" value="2" />
           <entry key="py" value="27" />
           <entry key="sql" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="Markdown" value="1" />
+          <entry key="Markdown" value="2" />
           <entry key="Python" value="27" />
           <entry key="SQL" value="7" />
         </counts>
@@ -90,11 +79,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="24" selection-start-line="24" selection-end-line="24" />
+            <state relative-caret-position="950">
+              <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
               <folding>
                 <element signature="e#13#22#0" expanded="true" />
-                <marker date="1535681128192" expanded="true" signature="315:316" ph="..." />
+                <marker date="1535704698956" expanded="true" signature="315:316" ph="..." />
               </folding>
             </state>
           </provider>
@@ -112,8 +101,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/err/func_dic.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="359">
-              <caret line="32" column="35" selection-start-line="32" selection-start-column="35" selection-end-line="32" selection-end-column="35" />
+            <state relative-caret-position="245">
+              <caret line="26" column="91" lean-forward="true" selection-start-line="26" selection-start-column="91" selection-end-line="26" selection-end-column="91" />
             </state>
           </provider>
         </entry>
@@ -121,15 +110,15 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/err/err_detect.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="213" column="25" selection-start-line="213" selection-start-column="25" selection-end-line="213" selection-end-column="25" />
+            <state relative-caret-position="267">
+              <caret line="168" column="69" selection-start-line="168" selection-start-column="69" selection-end-line="168" selection-end-column="69" />
               <folding>
                 <element signature="e#15#24#0" expanded="true" />
-                <marker date="1535702294727" expanded="false" signature="2212:2242" ph="..." />
-                <marker date="1535702294727" expanded="true" signature="9238:9305" ph="..." />
-                <marker date="1535702294727" expanded="false" signature="15227:15377" ph="..." />
-                <marker date="1535702294727" expanded="true" signature="18965:21653" ph="..." />
-                <marker date="1535702294727" expanded="true" signature="19370:19408" ph="..." />
+                <marker date="1535711777727" expanded="false" signature="2212:2242" ph="..." />
+                <marker date="1535711777727" expanded="true" signature="9246:9313" ph="..." />
+                <marker date="1535711777727" expanded="false" signature="15235:15385" ph="..." />
+                <marker date="1535711777727" expanded="true" signature="18973:21661" ph="..." />
+                <marker date="1535711777727" expanded="true" signature="19378:19416" ph="..." />
               </folding>
             </state>
           </provider>
@@ -138,24 +127,23 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/err/err_locate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="13" column="3" selection-start-line="13" selection-start-column="3" selection-end-line="13" selection-end-column="3" />
+            <state relative-caret-position="348">
+              <caret line="184" column="94" selection-start-line="184" selection-start-column="94" selection-end-line="184" selection-end-column="94" />
               <folding>
                 <element signature="e#19#28#0" expanded="true" />
                 <element signature="e#896#1507#0" />
                 <element signature="e#856#1306#0" />
+                <element signature="e#2011#3168#0" />
                 <element signature="e#3292#4548#0" />
-                <element signature="e#4625#5116#0" />
                 <element signature="e#5258#6495#0" />
-                <element signature="e#6532#7938#0" />
                 <element signature="e#8047#8579#0" />
                 <element signature="e#8694#10655#0" />
                 <element signature="e#10759#11628#0" />
-                <marker date="1535702734896" expanded="true" signature="215:220" ph="..." />
-                <marker date="1535702734896" expanded="true" signature="1617:1622" ph="..." />
-                <marker date="1535702734896" expanded="true" signature="8864:9407" ph="..." />
-                <marker date="1535702734896" expanded="true" signature="12454:12460" ph="..." />
-                <marker date="1535702734896" expanded="true" signature="14302:14404" ph="..." />
+                <marker date="1535712320136" expanded="true" signature="215:220" ph="..." />
+                <marker date="1535712320136" expanded="true" signature="1617:1622" ph="..." />
+                <marker date="1535712320136" expanded="true" signature="8879:9422" ph="..." />
+                <marker date="1535712320136" expanded="true" signature="12469:12475" ph="..." />
+                <marker date="1535712320136" expanded="true" signature="14317:14419" ph="..." />
               </folding>
             </state>
           </provider>
@@ -166,32 +154,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="267">
               <caret line="93" column="32" selection-start-line="93" selection-start-column="32" selection-end-line="93" selection-end-column="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/utils/load_and_transform.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="305">
-              <caret line="40" column="26" selection-start-line="40" selection-start-column="26" selection-end-line="40" selection-end-column="26" />
-              <folding>
-                <marker date="1535079359533" expanded="true" signature="620:659" ph="..." />
-                <marker date="1535079359533" expanded="true" signature="1098:1540" ph="..." />
-                <marker date="1535079359533" expanded="true" signature="1569:1603" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="171">
-                <caret line="9" column="65" selection-start-line="9" selection-start-column="65" selection-end-line="9" selection-end-column="65" />
-              </first_editor>
-              <second_editor />
             </state>
           </provider>
         </entry>
@@ -256,12 +218,12 @@
         <option value="$PROJECT_DIR$/options.py" />
         <option value="$PROJECT_DIR$/err/err_locator.py" />
         <option value="$PROJECT_DIR$/err/err_print.py" />
-        <option value="$PROJECT_DIR$/err/func_dic.py" />
         <option value="$PROJECT_DIR$/err/err_define.py" />
         <option value="$PROJECT_DIR$/main.py" />
-        <option value="$PROJECT_DIR$/utils/load_and_transform.py" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/err/func_dic.py" />
         <option value="$PROJECT_DIR$/err/err_detect.py" />
+        <option value="$PROJECT_DIR$/utils/load_and_transform.py" />
         <option value="$PROJECT_DIR$/err/err_locate.py" />
       </list>
     </option>
@@ -273,10 +235,10 @@
     <sorting>DEFINITION_ORDER</sorting>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="410" />
-    <option name="y" value="8" />
+    <option name="x" value="-33" />
+    <option name="y" value="91" />
     <option name="width" value="1606" />
-    <option name="height" value="1026" />
+    <option name="height" value="1004" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -289,6 +251,11 @@
             <path>
               <item name="code-review" type="b2602c69:ProjectViewProjectNode" />
               <item name="code-review" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="code-review" type="b2602c69:ProjectViewProjectNode" />
+              <item name="code-review" type="462c0819:PsiDirectoryNode" />
+              <item name="err" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="code-review" type="b2602c69:ProjectViewProjectNode" />
@@ -528,7 +495,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="410" y="8" width="1606" height="1026" extended-state="0" />
+    <frame x="-33" y="91" width="1606" height="1004" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4974026" visible="true" weight="0.19340234" />
@@ -536,7 +503,7 @@
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32951945" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.21612541" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.22158438" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.3975364" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -640,24 +607,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="24" selection-start-line="24" selection-end-line="24" />
-          <folding>
-            <element signature="e#13#22#0" expanded="true" />
-            <marker date="1535681128192" expanded="true" signature="315:316" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/options.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="133">
           <caret line="7" column="16" lean-forward="true" selection-start-line="7" selection-start-column="16" selection-end-line="7" selection-end-column="16" />
           <folding>
             <element signature="e#21#36#0" expanded="true" />
-            <marker date="1534902051971" expanded="true" signature="89:90" ph="..." />
+            <marker date="1535703914949" expanded="true" signature="89:90" ph="..." />
           </folding>
         </state>
       </provider>
@@ -669,31 +625,57 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/err/func_dic.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="359">
-          <caret line="32" column="35" selection-start-line="32" selection-start-column="35" selection-end-line="32" selection-end-column="35" />
+        <state relative-caret-position="950">
+          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+          <folding>
+            <element signature="e#13#22#0" expanded="true" />
+            <marker date="1535704698956" expanded="true" signature="315:316" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="171">
-            <caret line="9" column="65" selection-start-line="9" selection-start-column="65" selection-end-line="9" selection-end-column="65" />
+          <first_editor relative-caret-position="152">
+            <caret line="8" column="60" lean-forward="true" selection-start-line="8" selection-start-column="60" selection-end-line="8" selection-end-column="60" />
           </first_editor>
           <second_editor />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/err/func_dic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="245">
+          <caret line="26" column="91" lean-forward="true" selection-start-line="26" selection-start-column="91" selection-end-line="26" selection-end-column="91" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/err/err_detect.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="267">
+          <caret line="168" column="69" selection-start-line="168" selection-start-column="69" selection-end-line="168" selection-end-column="69" />
+          <folding>
+            <element signature="e#15#24#0" expanded="true" />
+            <marker date="1535711777727" expanded="false" signature="2212:2242" ph="..." />
+            <marker date="1535711777727" expanded="true" signature="9246:9313" ph="..." />
+            <marker date="1535711777727" expanded="false" signature="15235:15385" ph="..." />
+            <marker date="1535711777727" expanded="true" signature="18973:21661" ph="..." />
+            <marker date="1535711777727" expanded="true" signature="19378:19416" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/utils/load_and_transform.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="305">
-          <caret line="40" column="26" selection-start-line="40" selection-start-column="26" selection-end-line="40" selection-end-column="26" />
+        <state relative-caret-position="133">
+          <caret line="31" column="59" selection-start-line="31" selection-start-column="59" selection-end-line="31" selection-end-column="59" />
           <folding>
-            <marker date="1535079359533" expanded="true" signature="620:659" ph="..." />
-            <marker date="1535079359533" expanded="true" signature="1098:1540" ph="..." />
-            <marker date="1535079359533" expanded="true" signature="1569:1603" ph="..." />
+            <marker date="1535712028463" expanded="true" signature="620:659" ph="..." />
+            <marker date="1535712028463" expanded="true" signature="1107:1549" ph="..." />
+            <marker date="1535712028463" expanded="true" signature="1578:1612" ph="..." />
           </folding>
         </state>
       </provider>
@@ -705,41 +687,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/err/err_detect.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="213" column="25" selection-start-line="213" selection-start-column="25" selection-end-line="213" selection-end-column="25" />
-          <folding>
-            <element signature="e#15#24#0" expanded="true" />
-            <marker date="1535702294727" expanded="false" signature="2212:2242" ph="..." />
-            <marker date="1535702294727" expanded="true" signature="9238:9305" ph="..." />
-            <marker date="1535702294727" expanded="false" signature="15227:15377" ph="..." />
-            <marker date="1535702294727" expanded="true" signature="18965:21653" ph="..." />
-            <marker date="1535702294727" expanded="true" signature="19370:19408" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/err/err_locate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="13" column="3" selection-start-line="13" selection-start-column="3" selection-end-line="13" selection-end-column="3" />
+        <state relative-caret-position="348">
+          <caret line="184" column="94" selection-start-line="184" selection-start-column="94" selection-end-line="184" selection-end-column="94" />
           <folding>
             <element signature="e#19#28#0" expanded="true" />
             <element signature="e#896#1507#0" />
             <element signature="e#856#1306#0" />
+            <element signature="e#2011#3168#0" />
             <element signature="e#3292#4548#0" />
-            <element signature="e#4625#5116#0" />
             <element signature="e#5258#6495#0" />
-            <element signature="e#6532#7938#0" />
             <element signature="e#8047#8579#0" />
             <element signature="e#8694#10655#0" />
             <element signature="e#10759#11628#0" />
-            <marker date="1535702734896" expanded="true" signature="215:220" ph="..." />
-            <marker date="1535702734896" expanded="true" signature="1617:1622" ph="..." />
-            <marker date="1535702734896" expanded="true" signature="8864:9407" ph="..." />
-            <marker date="1535702734896" expanded="true" signature="12454:12460" ph="..." />
-            <marker date="1535702734896" expanded="true" signature="14302:14404" ph="..." />
+            <marker date="1535712320136" expanded="true" signature="215:220" ph="..." />
+            <marker date="1535712320136" expanded="true" signature="1617:1622" ph="..." />
+            <marker date="1535712320136" expanded="true" signature="8879:9422" ph="..." />
+            <marker date="1535712320136" expanded="true" signature="12469:12475" ph="..." />
+            <marker date="1535712320136" expanded="true" signature="14317:14419" ph="..." />
           </folding>
         </state>
       </provider>
