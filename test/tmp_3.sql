@@ -86,7 +86,14 @@ CREATE TABLE tmp_neo_fake.it_is_there_02(
 	(stat_dt, fst_org_nbr, fst_crd_dt, fst_crd_situ_cd, fst_prod_cd, fst_chnl_cd, fst_mch_nbr)
 )on commit preserve rows;
 
-CREATE TABLE tmp_neo_fake.it_is_there_03(
+
+/*
+
+this is the test of note
+select * from U;
+
+*/
+CREATE /* hello*/  TABLE tmp_neo_fake.it_is_there_03(
 	stat_dt Date NOT NULL DEFAULT '1900-01-01'::date,
 	fst_org_nbr Varchar(10) NOT NULL DEFAULT '',
 	fst_crd_dt Date Not NULL default '1900-01-01'::date,

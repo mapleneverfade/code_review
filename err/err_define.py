@@ -11,21 +11,21 @@ from copy import deepcopy
 '''
 
 err_dic = {
-            'select *'                       :[],      # yes
-            'count *'                        :[],      # yes
-            'flag_distinct'                 :[],      # yes
-            'case_no_else'                  :[],      # yes
-            'join_no_outer_inner'          :[],      # yes
-            'not_between'                   :[],      # yes
-            'multi_target'                  :[],
-            'multi_insert_target'          :[],
-            'etl_tms'                        :[],
-            'no_on_commit_preserve_rows'  :[],      # yes
-            'create_multi_tmp_table'       :[],
-            'drop_tmp_table'                :[],
-            'update_target'                 :[],
-            'explicit_field'                :[],
-            'where_exist_function'         :[]
+            'select *'                       :set(),      # yes
+            'count *'                        :set(),      # yes
+            'flag_distinct'                 :set(),      # yes
+            'case_no_else'                  :set(),      # yes
+            'join_no_outer_inner'          :set(),      # yes
+            'not_between'                   :set(),      # yes
+            'multi_target'                  :set(),
+            'multi_insert_target'          :set(),
+            'etl_tms'                        :set(),
+            'no_on_commit_preserve_rows'  :set(),      # yes
+            'create_multi_tmp_table'       :set(),
+            'drop_tmp_table'                :set(),
+            'update_target'                 :set(),
+            'explicit_field'                :set(),
+            'where_exist_function'         :set()
         }
 
 global_exception = {  # 统计全局错误

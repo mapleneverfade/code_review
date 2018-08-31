@@ -50,8 +50,8 @@ class err_detector():
             }
         # 辅助定位create|insert|select未显示提供字段语句。
         self.implicit_field = {
-                'create':None,    # create语句是否未显式指定字段。
-                'insert':None     # insert|select语句是否未显式指定字段。
+                'create':set(),    # create语句是否未显式指定字段。
+                'insert':set()     # insert|select语句是否未显式指定字段。
         }
     # 正则匹配select *,若存在，置global_exception为 True
     @property
@@ -150,7 +150,7 @@ class err_detector():
                 self.global_exception['no_on_commit_preserve_rows'] += 1
 
     def is_temp_table(self,table_name):
-        if not table_name.startswith('tmp'):
+        if not (table_name.startswith('tmp') or table_name.endswith('tmp') or table_name.startswith('temp') or table_name.endswith('temp')):
             return False
         else:
             return True
@@ -163,7 +163,7 @@ class err_detector():
         ************目标表检测***************
     '''
     def delete_target_detect(self, sql):
-        delete_pattern = '^delete.*from'
+        delete_pattern = '^delete.*?from'       # 惰性匹配
         delete_ = re.search(delete_pattern, sql.strip(), re.IGNORECASE)
         if delete_:
             table_name = sql.lower().replace(delete_.group(0), '').strip().split(' ')[0].strip()
@@ -189,14 +189,22 @@ class err_detector():
         两步正则。
         1、insert into {table} (field)
         2、insert into {table} select {field}
+        3、新情况，insert into ... select ...
     '''
 
     def insert_target_detect(self, sql):  #两步正则，先检测insert into, 再通过前向后向界定检测目标表名。
-        insert_pattern = '^insert.*into'
+        insert_pattern = '^insert.*?into'               # 惰性匹配
         insert_ = re.search(insert_pattern, sql.strip(), re.IGNORECASE)
         if insert_:
+            insert_str = insert_.group(0)
             try:
-                table_name = re.search(f'(?<={insert_.group(0)}).*?(?=\()', sql, re.IGNORECASE).group(0).strip()
+                insert_str = self.to_regular(insert_str)  # 转义正则表达式中特殊字符
+                table_name = re.search(f'(?<={insert_str}).*?(?=\\()', sql, re.IGNORECASE).group(0).strip()   # 情况1：以'（'结尾提取
+
+                table_name_select_end = re.search(f'(?<={insert_str}).*?(?=select)', sql, re.IGNORECASE)
+                if table_name_select_end and len(table_name_select_end.group(0).strip()) < len(table_name):  # 情况2,：以select结尾提取
+                    table_name = table_name_select_end
+
                 if not self.is_temp_table(table_name) and table_name not in self.target_table_name:
                     self.target_table_name.append(table_name)
                     self.global_exception['multi_target'] += 1       # 多目标表
@@ -208,13 +216,24 @@ class err_detector():
                     self.global_exception['multi_insert_target'] += 1
                     self.target_table_statement.append(sql)             # 记录目标表写入语句。
             except AttributeError as e:
-                print('未显示指定insert 字段！')
+                table_name = self.extract_table_name(sql, 'target')
+                #if not ('tmp' in table_name or 'temp' in table_name):   #　非临时表
+                if not self.is_temp_table(table_name):
+                    self.implicit_field['insert'].add(table_name)
+                #print('未显式指定insert 字段！')
                 self.global_exception['explicit_field'] = True      # 直接置错
 
     def multi_target_err(self, sql):            #检测目标表,综合insert、update、delete
         self.delete_target_detect(sql)
         self.update_target_detect(sql)
         self.insert_target_detect(sql)
+
+    '''
+        转化正则表达式，转换 *、+
+    '''
+    def to_regular(self, pattern):
+        return pattern.replace('*', '\*').replace('+', '\+')
+
     '''
         ************目标表检测***************
     '''
@@ -234,40 +253,63 @@ class err_detector():
         添加检测规则，创建表时可能存在未指定字段名情况。
         1、以 ( 结尾提取表名。
         2、以 \n 换行结尾提取表名。
+        3、两步提取on commit preserve rows
+        提取临时表名功能重构：
+                            1、以括号结尾
+                            2、以select结尾
+                            3、以as结尾
     '''
+    import time
     def extract_table_name(self, sql, flag = 'temp'):
         if flag == 'temp':
-            temp_pattern = '(?<=table).*?(?=\()'
-            enter_pattern = '(?<=table).*?(?=on)'                   # 以 on 结尾提取临时表名
-            result = re.search(temp_pattern, sql ,re.IGNORECASE)
-            if result:
-                pass
-            else:
-                result = re.search(enter_pattern, sql, re.IGNORECASE)   # 以 'on'为结尾提取临时表名，出现此种情况，说明没有指定字段。
-                self.global_exception['explicit_field'] = True      # 直接置错
-                #print(f'临时表 {result.group(0).strip()} 未显式指定任何字段！')
+            table_name_candidate = []                 # 存三种情况所提取表名
+            bracket_pattern = '(?<=table).*?(?=\()'
+            as_pattern = '(?<=table).*?(?=as)'
+            commit_pattern = 'on\s+?commit'         # 先提取 on commit...
+            commit_result = re.search(commit_pattern, sql, re.IGNORECASE)
 
-        elif flag=='target':
-            target_pattern = '(?<=into).*?(?=\()'                    # 待插入目标表名
-            result = re.search(target_pattern, sql, re.IGNORECASE)
+            if commit_result:
+                table_on_commit_pattern = f'(?<=table).*?(?={self.to_regular(commit_result.group(0))})'
+                table_on_commit_result = re.search(table_on_commit_pattern, sql, re.IGNORECASE)    # 提取以'(' 结尾表名
+                table_name_candidate.append(table_on_commit_result.group(0))
+
+            bracket_result = re.search(bracket_pattern, sql, re.IGNORECASE)         # 提取以 '(' 结尾表名
+            if bracket_result:
+                table_name_candidate.append(bracket_result.group(0))
+
+            as_result = re.search(as_pattern, sql, re.IGNORECASE)                  #　提取以 'as' 结尾表名
+            if as_result:
+                table_name_candidate.append(as_result.group(0))
+
+            return min(table_name_candidate).strip()                     # 返回三种情况中最短表名
+
+        elif flag == 'target':
+            table_name_candidate = []
+            insert_into_pattern ='insert(.|\n)+?into'
+            insert_into_result = re.search(insert_into_pattern, sql, re.IGNORECASE)
+
+            bracket_result = re.search(f'(?<={self.to_regular(insert_into_result.group(0).strip())}).*?(?=\()', sql, re.IGNORECASE)    # 以括号结尾
+            select_result = re.search(f'(?<={self.to_regular(insert_into_result.group(0).strip())}).*?(?=select)', sql, re.IGNORECASE) # 以select结尾
+            if bracket_result:
+                table_name_candidate.append(bracket_result.group(0))
+            if select_result:
+                table_name_candidate.append(select_result.group(0))
+            return min(table_name_candidate).strip()
+
         else:
-            print('提取表名过程错误！')
-        return result.group(0).strip()
+            pass
 
     '''
         提取字段名
     '''
     # 考虑重构功能，将提取字段与对比功能抽象为新类。
-
     def explicit_field(self):
         # self.tmp_field — self.target_field
         # self.tmp_create_statement — self.target_table_statement
         # 提取 tmp_table 名
-
         for i in self.tmp_create_statement:
             name_ = self.extract_table_name(i, 'temp')
             #self.tmp_field[name_] = self.split_to_field(i, 'temp')    # 提取字段加入self.tmp_field
-
             self.split_to_field.statement = i
             middle_param = self.split_to_field.to_field('temp')
             if middle_param:                                           # 提取创建临时表中间字段，若为空，则说明未显式指定字段。
@@ -278,23 +320,20 @@ class err_detector():
                 '''
                 新增部分，辅助检测insert|select字段是否未显式指定字段
                 '''
-                self.implicit_field['create'] = (True, name_)        # create语句未显式提供字段，将表名传递给err_locate.
+                #self.implicit_field['create'] = (True, name_)        # create语句未显式提供字段，将表名传递给err_locate.
+                self.implicit_field['create'].add(name_)          # 更正，将所有未显式赋值表均记录
 
         for i in self.target_table_statement:
             name_ = self.extract_table_name(i, 'target')
-            #self.target_field[name_+'_insert'], self.target_field[name_+'_select'] = self.split_to_field(i, 'target')
             self.split_to_field.statement = i
-            self.target_field[name_ + '_insert'], self.target_field[name_ + '_select'] = self.split_to_field.to_field('target')
-
-
+            self.target_field[name_ + '_insert'], self.target_field[name_ + '_select'], comma_ = self.split_to_field.to_field('target')
 
             self.insert_set.add(len(self.target_field[name_+'_insert']))
             self.select_set.add(len(self.target_field[name_+'_select']))
-            #print(self.target_field, self.tmp_field)
             #print(self.insert_set,self.select_set,self.create_set)
-            if len(self.target_field[name_+'_insert']) != len(self.target_field[name_+'_select']):
-                self.implicit_field['insert'] = (True, name_)
-
+            if len(self.target_field[name_+'_insert']) + comma_ != len(self.target_field[name_+'_select']): # 更换对比方式，计算逗号数量
+                #self.implicit_field['insert'] = (True, name_)
+                self.implicit_field['insert'].add(name_)     # 更正，将所有未显式赋值插入语句均记录
 
     '''
         where 条件字段函数判断需要更改逻辑，适配不同脚本情况。
@@ -309,7 +348,7 @@ class err_detector():
         where_pattern = 'where.*?;'
         select_pattern = 'select.*?from'
         having_pattern = 'having.*'
-        join_pattern = 'join.*where'
+        join_pattern = 'join.*?where'
         result = re.findall(where_pattern, sql.lower(), re.DOTALL)
         func = []
         for i in function.values():
@@ -326,7 +365,7 @@ class err_detector():
                 func_pattern = f'{func_}\\(.*?\\)'
                 func_detect_result = re.search(func_pattern, concat, re.IGNORECASE)
                 if func_detect_result:
-                    print(func_detect_result.group(0))
+                    #print(func_detect_result.group(0))
                     self.global_exception['where_exist_function'] = True
                     self.where_func['isExist'] = True
                     self.where_func['function'].append(func_detect_result.group(0))
@@ -407,6 +446,10 @@ class err_detector():
                 'isExist': False,
                 'function':[]
             }
+        self.implicit_field = {
+                'create':set(),    # create语句是否未显式指定字段。
+                'insert':set()     # insert|select语句是否未显式指定字段。
+        }
     '''
         去掉所有注释，排除检测干扰。
     '''
@@ -472,12 +515,19 @@ class statement_to_field():
                     for frame_statement in insert_result.group(0).split(','):
                         insert_field_name.append(frame_statement)
 
-                    select_result = re.sub('(?<=\().*?(?=\))', '', select_result.group(0))  # 去掉select函数中的内容','
+                    select_result = select_result.group(0)
+                    #select_result = re.sub('(?<=\\().*?(?=\\))', '', select_result.group(0))  # 去掉select函数中的内容','
+                    '''
+                        统计select...from中的逗号数
+                    '''
+                    num_comma_select = len(re.findall(',', select_result, re.IGNORECASE))
+                    num_comma_insert = len(re.findall(',', insert_result.group(0), re.IGNORECASE))
                     for frame_statement in select_result.split(','):
                         select_field_name.append(frame_statement)
-                #self.insert_set.add(len(insert_field_name))
-                #self.select_set.add(len(select_field_name))
-                return insert_field_name, select_field_name
+                try:
+                    return insert_field_name, select_field_name, num_comma_select-num_comma_insert
+                except UnboundLocalError as e:
+                    return insert_field_name, select_field_name, 0
             else:
                 print('提取字段过程错误！')
 
