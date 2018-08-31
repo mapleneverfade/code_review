@@ -54,7 +54,3 @@ if __name__=='__main__':
     main = code_review()
     main.run()
 
-
-
-	print('test of git')
-	print('new branch')
